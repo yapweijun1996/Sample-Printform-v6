@@ -16,6 +16,35 @@ var papersize_height = papersize_height || 1050; // Default to a standard A4 hei
 var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
 /****** Setting [end  ] ******/
 
+// [INJECT] Read per-form config from data-* attributes
+function getPrintformConfig(formEl) {
+	const ds = formEl.dataset;
+	return {
+		papersizeWidth: ds.papersizeWidth ? +ds.papersizeWidth : papersize_width,
+		papersizeHeight: ds.papersizeHeight ? +ds.papersizeHeight : papersize_height,
+		heightOfDummyRowItem: ds.heightOfDummyRowItem ? +ds.heightOfDummyRowItem : height_of_dummy_row_item,
+		repeatHeader: ds.repeatHeader ? ds.repeatHeader === "y" : repeat_header === "y",
+		repeatDocinfo: ds.repeatDocinfo ? ds.repeatDocinfo === "y" : repeat_docinfo === "y",
+		repeatRowheader: ds.repeatRowheader ? ds.repeatRowheader === "y" : repeat_rowheader === "y",
+		repeatFooter: ds.repeatFooter ? ds.repeatFooter === "y" : repeat_footer === "y",
+		repeatFooterLogo: ds.repeatFooterLogo ? ds.repeatFooterLogo === "y" : repeat_footer_logo === "y",
+		insertDummyRowItemWhileFormatTable: ds.insertDummyRowItemWhileFormatTable
+			? ds.insertDummyRowItemWhileFormatTable === "y"
+			: insert_dummy_row_item_while_format_table === "y",
+		insertDummyRowWhileFormatTable: ds.insertDummyRowWhileFormatTable
+			? ds.insertDummyRowWhileFormatTable === "y"
+			: insert_dummy_row_while_format_table === "y",
+		insertFooterSpacerWhileFormatTable: ds.insertFooterSpacerWhileFormatTable
+			? ds.insertFooterSpacerWhileFormatTable === "y"
+			: insert_footer_spacer_while_format_table === "y",
+		insertFooterSpacerWithDummyRowItemWhileFormatTable: ds.insertFooterSpacerWithDummyRowItemWhileFormatTable
+			? ds.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y"
+			: insert_footer_spacer_with_dummy_row_item_while_format_table === "y",
+		customDummyRowItemContent: 'customDummyRowItemContent' in ds
+			? ds.customDummyRowItemContent
+			: custom_dummy_row_item_content
+	};
+}
 
 function add_dummy_row(target_element, papersize_width, height_of_dummy_row){
 	
@@ -202,145 +231,212 @@ function addProcessedInClassName(input_ele, input_classname){
 	input_ele.classList.add(temp_class_name_new);
 }
 
-
-function printform_process(){
+// [MODIFY] Refactor printform_process to accept element and config
+async function printform_process(formEl, config){
+	// Override globals from per-form config
+	const {
+		papersizeWidth,
+		papersizeHeight,
+		heightOfDummyRowItem,
+		repeatHeader,
+		repeatDocinfo,
+		repeatRowheader,
+		repeatFooter,
+		repeatFooterLogo,
+		insertDummyRowItemWhileFormatTable,
+		insertDummyRowWhileFormatTable,
+		insertFooterSpacerWhileFormatTable,
+		insertFooterSpacerWithDummyRowItemWhileFormatTable,
+		customDummyRowItemContent
+	} = config;
+	papersize_width = papersizeWidth;
+	papersize_height = papersizeHeight;
+	height_of_dummy_row_item = heightOfDummyRowItem;
+	repeat_header = repeatHeader ? "y" : "n";
+	repeat_docinfo = repeatDocinfo ? "y" : "n";
+	repeat_rowheader = repeatRowheader ? "y" : "n";
+	repeat_footer = repeatFooter ? "y" : "n";
+	repeat_footer_logo = repeatFooterLogo ? "y" : "n";
+	insert_dummy_row_item_while_format_table = insertDummyRowItemWhileFormatTable ? "y" : "n";
+	insert_dummy_row_while_format_table = insertDummyRowWhileFormatTable ? "y" : "n";
+	insert_footer_spacer_while_format_table = insertFooterSpacerWhileFormatTable ? "y" : "n";
+	insert_footer_spacer_with_dummy_row_item_while_format_table = insertFooterSpacerWithDummyRowItemWhileFormatTable ? "y" : "n";
+	custom_dummy_row_item_content = customDummyRowItemContent;
+	// Use the passed element
+	const printform = formEl;
+	var pformat = document.createElement('div');
+	pformat.classList.add("printform_formatter");
+	printform.parentNode.insertBefore(pformat, printform);
+	pformat = document.querySelector(".printform_formatter");
 	
-	return new Promise(resolve => {
-		
-		var printform = document.querySelector(".printform");
-		var pformat = document.createElement('div');
-		pformat.classList.add("printform_formatter");
-		printform.parentNode.insertBefore(pformat, printform);
-		pformat = document.querySelector(".printform_formatter");
-		
-		var pheader = printform.querySelector(".pheader");
-		var ph_height = parseFloat(pheader.getBoundingClientRect().height.toFixed(2));
+	var pheader = printform.querySelector(".pheader");
+	var ph_height = parseFloat(pheader.getBoundingClientRect().height.toFixed(2));
+	console.log("ph_height : " + ph_height);
+	
+	var pdocinfo = printform.querySelector(".pdocinfo");
+	var pdi_height = parseFloat(pdocinfo.getBoundingClientRect().height.toFixed(2));
+	console.log("pdi_height : " + pdi_height);
+	
+	var prowheader = printform.querySelector(".prowheader");
+	var prh_height = parseFloat(prowheader.getBoundingClientRect().height.toFixed(2));
+	console.log("prd_height : " + prh_height);
+	
+	var pfooter = printform.querySelector(".pfooter");
+	var pf_height = parseFloat(pfooter.getBoundingClientRect().height.toFixed(2));
+	console.log("pf_height : " + pf_height);
+	
+	var pfooter_logo = printform.querySelector(".pfooter_logo");
+	var pfl_height = parseFloat(pfooter_logo.getBoundingClientRect().height.toFixed(2));
+	console.log("pfl_height : " + pfl_height);
+	
+	var prowitem = printform.querySelectorAll(".prowitem");
+	var pr_height = 0;
+	var temp;
+	for( var i = 0; i < prowitem.length ; i ++){
+		temp = parseFloat(prowitem[i].getBoundingClientRect().height.toFixed(2));
+		if(temp != 0){
+			pr_height += temp;
+		}
+	}
+	console.log("pr_height : " + pr_height);
+	
+	
+	var pfooter_spacer = document.createElement('div');
+	pfooter_spacer.classList.add("pfooter_spacer");
+	pfooter_spacer.classList.add("paper_width");
+	pfooter_spacer.style.height = "0px";
+	
+	var div_page_break_before = document.createElement('div');
+	div_page_break_before.classList.add("div_page_break_before");
+	div_page_break_before.style.pageBreakBefore = "always";
+	div_page_break_before.style.height = '0px';
+	
+	/***** Generate Page [start] *****/
+	var clone_pheader;
+	var clone_pdocinfo;
+	var clone_prowheader;
+	var clone_pfooter;
+	var clone_pfooter_logo;
+	var clone_prowitem;
+	var clone_div_page_break_before;
+	var clone_pfooter_spacer;
+	var current_page_height = 0;
+	var height_per_page = 0;
+	var remaining_height_per_page = 0;
+	var remainder_for_remaining_height_per_page ;
+	var tb_page_break_before_yn = "" ;
+	
+	console.log("papersize_height : " + papersize_height);
+	height_per_page = papersize_height;
+	if(repeat_header == "y"){
 		console.log("ph_height : " + ph_height);
-		
-		var pdocinfo = printform.querySelector(".pdocinfo");
-		var pdi_height = parseFloat(pdocinfo.getBoundingClientRect().height.toFixed(2));
+		height_per_page -= ph_height;
+	}
+	if(repeat_docinfo == "y"){
 		console.log("pdi_height : " + pdi_height);
-		
-		var prowheader = printform.querySelector(".prowheader");
-		var prh_height = parseFloat(prowheader.getBoundingClientRect().height.toFixed(2));
-		console.log("prd_height : " + prh_height);
-		
-		var pfooter = printform.querySelector(".pfooter");
-		var pf_height = parseFloat(pfooter.getBoundingClientRect().height.toFixed(2));
+		height_per_page -= pdi_height;
+	}
+	if(repeat_rowheader == "y"){
+		console.log("prh_height : " + prh_height);
+		height_per_page -= prh_height;
+	}
+	if(repeat_footer == "y"){
 		console.log("pf_height : " + pf_height);
-		
-		var pfooter_logo = printform.querySelector(".pfooter_logo");
-		var pfl_height = parseFloat(pfooter_logo.getBoundingClientRect().height.toFixed(2));
+		height_per_page -= pf_height;
+	}
+	if(repeat_footer_logo == "y"){
 		console.log("pfl_height : " + pfl_height);
+		height_per_page -= pfl_height;
+	}
+	console.log("height_per_page : " + height_per_page);
+	
+	addProcessedInClassName(pheader, "pheader");
+	addProcessedInClassName(pdocinfo, "pdocinfo");
+	addProcessedInClassName(prowheader, "prowheader");
+	addProcessedInClassName(pfooter, "pfooter");
+	addProcessedInClassName(pfooter_logo, "pfooter_logo");
+	
+	// Loop all row item [start]
+	for( var i = 0; i < prowitem.length ; i ++){
+		temp = parseFloat(prowitem[i].getBoundingClientRect().height.toFixed(2));
 		
-		var prowitem = printform.querySelectorAll(".prowitem");
-		var pr_height = 0;
-		var temp;
-		for( var i = 0; i < prowitem.length ; i ++){
-			temp = parseFloat(prowitem[i].getBoundingClientRect().height.toFixed(2));
-			if(temp != 0){
-				pr_height += temp;
+		if(current_page_height == 0){
+			addHeader(pheader, pformat);
+			if(repeat_header == "y"){
+				
+			}else{
+				current_page_height += ph_height;
+			}
+			
+			addDocInfo(pdocinfo, pformat);
+			
+			if(repeat_docinfo == "y"){
+				
+			}else{
+				current_page_height += pdi_height;
+			}
+			
+			addRowHeader(prowheader, pformat);
+			if(repeat_rowheader == "y"){
+				
+			}else{
+				current_page_height += prh_height;
 			}
 		}
-		console.log("pr_height : " + pr_height);
 		
+		current_page_height += temp;
 		
-		var pfooter_spacer = document.createElement('div');
-		pfooter_spacer.classList.add("pfooter_spacer");
-		pfooter_spacer.classList.add("paper_width");
-		pfooter_spacer.style.height = "0px";
+		addProcessedInClassName(prowitem[i], "prowitem");
 		
-		var div_page_break_before = document.createElement('div');
-		div_page_break_before.classList.add("div_page_break_before");
-		div_page_break_before.style.pageBreakBefore = "always";
-		div_page_break_before.style.height = '0px';
-		
-		/***** Generate Page [start] *****/
-		var clone_pheader;
-		var clone_pdocinfo;
-		var clone_prowheader;
-		var clone_pfooter;
-		var clone_pfooter_logo;
-		var clone_prowitem;
-		var clone_div_page_break_before;
-		var clone_pfooter_spacer;
-		var current_page_height = 0;
-		var height_per_page = 0;
-		var remaining_height_per_page = 0;
-		var remainder_for_remaining_height_per_page ;
-		var tb_page_break_before_yn = "" ;
-		
-		console.log("papersize_height : " + papersize_height);
-		height_per_page = papersize_height;
-		if(repeat_header == "y"){
-			console.log("ph_height : " + ph_height);
-			height_per_page -= ph_height;
+		if (prowitem[i].classList.contains('tb_page_break_before')) {
+			tb_page_break_before_yn = "y";
 		}
-		if(repeat_docinfo == "y"){
-			console.log("pdi_height : " + pdi_height);
-			height_per_page -= pdi_height;
-		}
-		if(repeat_rowheader == "y"){
-			console.log("prh_height : " + prh_height);
-			height_per_page -= prh_height;
-		}
-		if(repeat_footer == "y"){
-			console.log("pf_height : " + pf_height);
-			height_per_page -= pf_height;
-		}
-		if(repeat_footer_logo == "y"){
-			console.log("pfl_height : " + pfl_height);
-			height_per_page -= pfl_height;
-		}
-		console.log("height_per_page : " + height_per_page);
-		
-		addProcessedInClassName(pheader, "pheader");
-		addProcessedInClassName(pdocinfo, "pdocinfo");
-		addProcessedInClassName(prowheader, "prowheader");
-		addProcessedInClassName(pfooter, "pfooter");
-		addProcessedInClassName(pfooter_logo, "pfooter_logo");
-		
-		// Loop all row item [start]
-		for( var i = 0; i < prowitem.length ; i ++){
-			temp = parseFloat(prowitem[i].getBoundingClientRect().height.toFixed(2));
+		if(tb_page_break_before_yn == "y"){
 			
-			if(current_page_height == 0){
+			current_page_height -= temp;
+			
+			current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
+
+			current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
+			
+			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+			
+			process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+			
+			if(repeat_footer == "y"){
+				addFooter(pfooter, pformat);
+			}
+			
+			if(repeat_footer_logo == "y"){
+				addFooterLogo(pfooter_logo, pformat);
+			}
+			
+			addDivPageBreakBefore(div_page_break_before, pformat);
+			
+			if(repeat_header == "y"){
 				addHeader(pheader, pformat);
-				if(repeat_header == "y"){
-					
-				}else{
-					current_page_height += ph_height;
-				}
-				
+			}
+			
+			if(repeat_docinfo == "y"){
 				addDocInfo(pdocinfo, pformat);
-				
-				if(repeat_docinfo == "y"){
-					
-				}else{
-					current_page_height += pdi_height;
-				}
-				
+			}
+			
+			if(repeat_rowheader == "y"){
 				addRowHeader(prowheader, pformat);
-				if(repeat_rowheader == "y"){
-					
-				}else{
-					current_page_height += prh_height;
-				}
 			}
 			
-			current_page_height += temp;
+			addRowItem(prowitem, i, pformat);
 			
-			addProcessedInClassName(prowitem[i], "prowitem");
-			
-			if (prowitem[i].classList.contains('tb_page_break_before')) {
-				tb_page_break_before_yn = "y";
-			}
-			if(tb_page_break_before_yn == "y"){
-				
+			current_page_height = temp;
+			tb_page_break_before_yn = "n";
+		}else{
+			if(current_page_height <= height_per_page){
+				addRowItem(prowitem, i, pformat);
+			}else{
 				current_page_height -= temp;
 				
 				current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
-
+				
 				current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
 				
 				current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
@@ -372,167 +468,125 @@ function printform_process(){
 				addRowItem(prowitem, i, pformat);
 				
 				current_page_height = temp;
-				tb_page_break_before_yn = "n";
-			}else{
-				if(current_page_height <= height_per_page){
-					addRowItem(prowitem, i, pformat);
-				}else{
-					current_page_height -= temp;
-					
-					current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
-					
-					current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
-					
-					current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
-					
-					process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
-					
-					if(repeat_footer == "y"){
-						addFooter(pfooter, pformat);
-					}
-					
-					if(repeat_footer_logo == "y"){
-						addFooterLogo(pfooter_logo, pformat);
-					}
-					
-					addDivPageBreakBefore(div_page_break_before, pformat);
-					
-					if(repeat_header == "y"){
-						addHeader(pheader, pformat);
-					}
-					
-					if(repeat_docinfo == "y"){
-						addDocInfo(pdocinfo, pformat);
-					}
-					
-					if(repeat_rowheader == "y"){
-						addRowHeader(prowheader, pformat);
-					}
-					
-					addRowItem(prowitem, i, pformat);
-					
-					current_page_height = temp;
-				}
 			}
+		}
+		
+	}
+	// Loop all row item [end  ]
+	
+	// Last Footer [start]
+	current_page_height += pf_height;
+	current_page_height += pfl_height;
+	if(repeat_footer == "y"){
+		current_page_height -= pf_height;
+	}
+	if(repeat_footer_logo == "y"){
+		current_page_height -= pfl_height;
+	}
+
+		cl("%%%%%%%%%%%%%%%%%%%%");
+		cl("current_page_height");
+		cl(current_page_height);
+		cl("%%%%%%%%%%%%%%%%%%%%");
+		cl("height_per_page");
+		cl(height_per_page);
+	
+	if(current_page_height <= height_per_page){
+		// Spacer [start] 
+		current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
+		
+		current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
+		
+		current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+		
+		process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+		// Spacer [end  ] 
+		
+		addFooter(pfooter, pformat);
+		addFooterLogo(pfooter_logo, pformat);
+	}else{
+		// Last Second Page Footer [start] 
+		current_page_height -= pf_height;
+		current_page_height -= pfl_height;
+		
+		if(repeat_footer == "y"){
+			current_page_height += pf_height;
+		}
+		if(repeat_footer_logo == "y"){
+			current_page_height += pfl_height;
+		}
+		
+		current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
+		
+		current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
+		
+		current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+		
+		process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+		
+		if(repeat_footer == "y"){
+			addFooterLogo(pfooter, pformat);
+		}
+		if(repeat_footer_logo == "y"){
+			addFooterLogo(pfooter_logo, pformat);
+		}
+				
+		// Last Second Page Footer [end  ] 
+		addDivPageBreakBefore(div_page_break_before, pformat);
+		
+		// Last Page Footer [start] 
+		current_page_height = 0;
+		
+		
+		if(repeat_header == "y"){
+			addHeader(pheader, pformat);
+		}else{
 			
 		}
-		// Loop all row item [end  ]
 		
-		// Last Footer [start]
-		current_page_height += pf_height;
-		current_page_height += pfl_height;
+		if(repeat_docinfo == "y"){
+			addDocInfo(pdocinfo, pformat);
+		}else{
+			
+		}
+		
+		if(repeat_rowheader == "y"){
+			addRowHeader(prowheader, pformat);
+		}else{
+			
+		}
+		
 		if(repeat_footer == "y"){
 			current_page_height -= pf_height;
 		}
 		if(repeat_footer_logo == "y"){
 			current_page_height -= pfl_height;
 		}
+		
+		current_page_height += pf_height;
+		current_page_height += pfl_height;
+		
+		// Spacer [start] 
+		current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
+		
+		current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
+		
+		current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+		
+		process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+		// Spacer [end  ] 
+		
+		addFooter(pfooter, pformat);
+		addFooterLogo(pfooter_logo, pformat);
+		// Last Page Footer [end  ] 
+	}
+	// Last Footer [end  ]
 	
-			cl("%%%%%%%%%%%%%%%%%%%%");
-			cl("current_page_height");
-			cl(current_page_height);
-			cl("%%%%%%%%%%%%%%%%%%%%");
-			cl("height_per_page");
-			cl(height_per_page);
-		
-		if(current_page_height <= height_per_page){
-			// Spacer [start] 
-			current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
-			
-			current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
-			
-			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
-			
-			process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
-			// Spacer [end  ] 
-			
-			addFooter(pfooter, pformat);
-			addFooterLogo(pfooter_logo, pformat);
-		}else{
-			// Last Second Page Footer [start] 
-			current_page_height -= pf_height;
-			current_page_height -= pfl_height;
-			
-			if(repeat_footer == "y"){
-				current_page_height += pf_height;
-			}
-			if(repeat_footer_logo == "y"){
-				current_page_height += pfl_height;
-			}
-			
-			current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
-			
-			current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
-			
-			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
-			
-			process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
-			
-			if(repeat_footer == "y"){
-				addFooterLogo(pfooter, pformat);
-			}
-			if(repeat_footer_logo == "y"){
-				addFooterLogo(pfooter_logo, pformat);
-			}
-					
-			// Last Second Page Footer [end  ] 
-			addDivPageBreakBefore(div_page_break_before, pformat);
-			
-			// Last Page Footer [start] 
-			current_page_height = 0;
-			
-			
-			if(repeat_header == "y"){
-				addHeader(pheader, pformat);
-			}else{
-				
-			}
-			
-			if(repeat_docinfo == "y"){
-				addDocInfo(pdocinfo, pformat);
-			}else{
-				
-			}
-			
-			if(repeat_rowheader == "y"){
-				addRowHeader(prowheader, pformat);
-			}else{
-				
-			}
-			
-			if(repeat_footer == "y"){
-				current_page_height -= pf_height;
-			}
-			if(repeat_footer_logo == "y"){
-				current_page_height -= pfl_height;
-			}
-			
-			current_page_height += pf_height;
-			current_page_height += pfl_height;
-			
-			// Spacer [start] 
-			current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
-			
-			current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
-			
-			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
-			
-			process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
-			// Spacer [end  ] 
-			
-			addFooter(pfooter, pformat);
-			addFooterLogo(pfooter_logo, pformat);
-			// Last Page Footer [end  ] 
-		}
-		// Last Footer [end  ]
-		
-		
-		addProcessedInClassName(pformat, "printform_formatter");
-		
-		printform.remove();
-		console.log("printform : remove");
-		resolve();
-	});
+	
+	addProcessedInClassName(pformat, "printform_formatter");
+	
+	printform.remove();
+	console.log("printform : remove");
 }
 /***** Generate Page [end  ] *****/
 
@@ -551,21 +605,17 @@ function pause_in_milliseconds(time) {
 	return new Promise(pause_the_function);
 }
 
-async function run_function_sequentially() {
-	var printform = document.querySelectorAll(".printform");
-	var prinbform_no =  printform.length;
-	console.log(prinbform_no);
-	for(var i = 0; i < prinbform_no; i ++){
-		try{await pause_in_milliseconds(1);}catch(error){console.error("pause_in_milliseconds error");}
-		try{await printform_process();}     catch(error){console.error("printform_process error");}
+// Orchestrator: process each .printform with its own config
+async function processAllPrintForms() {
+	window.run_function_sequentially_processed = window.run_function_sequentially_processed || false;
+	if (window.run_function_sequentially_processed) return;
+	const forms = document.querySelectorAll(".printform");
+	for (const formEl of forms) {
+		const cfg = getPrintformConfig(formEl);
+		try { await pause_in_milliseconds(1); } catch (error) { console.error("pause_in_milliseconds error"); }
+		try { await printform_process(formEl, cfg); } catch (error) { console.error("printform_process error"); }
 	}
+	window.run_function_sequentially_processed = true;
 }
 
-if(!run_function_sequentially_processed){ var run_function_sequentially_processed = false; }
-
-window.onload = function() {
-    if(run_function_sequentially_processed == false){
-		run_function_sequentially();
-		run_function_sequentially_processed = true;
-	}
-};
+window.onload = processAllPrintForms;
