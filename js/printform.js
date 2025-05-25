@@ -55,18 +55,18 @@ function addDummyRow(targetElement, currentPapersizeWidth, heightOfDummyRow){
 
 /**
  * Adds a dummy row item (table) to a target DOM element.
- * Uses global `papersize_width` and `custom_dummy_row_item_content`.
  * @param {HTMLElement} targetElement - The DOM element to which the dummy row item will be appended.
  * @param {number} currentHeightOfDummyRowItem - The height of the dummy row item.
+ * @param {object} config - The configuration object for the current print form.
  * @example
  * const myContainer = document.getElementById('items');
- * addDummyRowItem(myContainer, 18);
+ * addDummyRowItem(myContainer, 18, currentConfig);
  */
-function addDummyRowItem(targetElement, currentHeightOfDummyRowItem){
+function addDummyRowItem(targetElement, currentHeightOfDummyRowItem, config){
 	
 	const dummyRowItemTable = document.createElement('table');
 	dummyRowItemTable.className = 'dummy_row_item';
-	dummyRowItemTable.setAttribute('width', papersize_width + 'px');
+	dummyRowItemTable.setAttribute('width', config.papersizeWidth + 'px');
 	dummyRowItemTable.setAttribute('cellspacing', '0');
 	dummyRowItemTable.setAttribute('cellpadding', '0');
 	
@@ -76,9 +76,9 @@ function addDummyRowItem(targetElement, currentHeightOfDummyRowItem){
 	</tr>
 	`;
 	
-	if(typeof custom_dummy_row_item_content !== "undefined"){
-		if(custom_dummy_row_item_content !== ""){
-			dummyRowItemInnerHtml = custom_dummy_row_item_content;
+	if(typeof config.customDummyRowItemContent !== "undefined"){
+		if(config.customDummyRowItemContent !== ""){
+			dummyRowItemInnerHtml = config.customDummyRowItemContent;
 		}
 	}
 	dummyRowItemTable.innerHTML = dummyRowItemInnerHtml;
@@ -89,21 +89,19 @@ function addDummyRowItem(targetElement, currentHeightOfDummyRowItem){
  * Inserts multiple dummy row items based on the available height.
  * @param {HTMLElement} targetElement - The DOM element to which dummy items will be appended.
  * @param {number} diffHeightFromPapersize - The total height available to fill with dummy items.
- * @param {number} heightOfDummyRow - The height of a single dummy row item.
+ * @param {number} heightOfSingleDummyItem - The height of a single dummy row item.
+ * @param {object} config - The configuration object for the current print form.
  * @example
  * const mySection = document.getElementById('spacer_section');
- * insertDummyRowItems(mySection, 100, 20); // Adds 5 dummy items
+ * insertDummyRowItems(mySection, 100, 20, currentConfig);
  */
-function insertDummyRowItems(targetElement, diffHeightFromPapersize, heightOfDummyRow){
-	// Add spacer [start] insert dummy row item
+function insertDummyRowItems(targetElement, diffHeightFromPapersize, heightOfSingleDummyItem, config){
 	if(diffHeightFromPapersize > 0){
-		let numberOfDummyRowItemsToBeInserted = 0;
-		numberOfDummyRowItemsToBeInserted = Math.floor(diffHeightFromPapersize / heightOfDummyRow);
+		let numberOfDummyRowItemsToBeInserted = Math.floor(diffHeightFromPapersize / heightOfSingleDummyItem);
 		for( let i = 0 ; i < numberOfDummyRowItemsToBeInserted ; i++){
-			addDummyRowItem(targetElement, heightOfDummyRow);
+			addDummyRowItem(targetElement, heightOfSingleDummyItem, config);
 		}
 	}
-	// Add spacer [end  ] insert dummy row item
 }
 
 /**
@@ -112,216 +110,167 @@ function insertDummyRowItems(targetElement, diffHeightFromPapersize, heightOfDum
  * @param {HTMLElement} pFooterSpacerElement - The footer spacer element to clone and append.
  * @param {number} heightPerPage - The total height available per page.
  * @param {number} currentPageHeight - The current accumulated height on the page.
- * @param {string} currentRepeatFooterLogo - Flag ("y" or "n") if footer logo is repeated.
+ * @param {string} currentRepeatFooterLogoConfig - Flag ("y" or "n") from config.repeatFooterLogo.
  * @param {number} pFooterLogoHeight - Height of the footer logo.
  * @param {HTMLElement} pFormatElement - The main formatting container element.
  * @example
- * processInsertFooterSpacer("y", footerSpacerDiv, 1000, 800, "y", 50, mainFormatDiv);
+ * processInsertFooterSpacer("y", footerSpacerDiv, 1000, 800, currentConfig.repeatFooterLogo, 50, mainFormatDiv);
  */
-function processInsertFooterSpacer(shouldInsertFooterSpacer, pFooterSpacerElement, heightPerPage, currentPageHeight, currentRepeatFooterLogo, pFooterLogoHeight, pFormatElement){
-	// console.log("processInsertFooterSpacer : start");
-	/***** insert_footer_spacer_while_format_table [start] *****/
+function processInsertFooterSpacer(shouldInsertFooterSpacer, pFooterSpacerElement, heightPerPage, currentPageHeight, currentRepeatFooterLogoConfig, pFooterLogoHeight, pFormatElement){
 	if(shouldInsertFooterSpacer === "y"){
 		const clonePfooterSpacer = pFooterSpacerElement.cloneNode(true);
-		
 		let remainingHeightPerPage = heightPerPage - currentPageHeight;
 		
-		if(currentRepeatFooterLogo !== "y"){
+		if(currentRepeatFooterLogoConfig !== "y"){
 			remainingHeightPerPage = remainingHeightPerPage - pFooterLogoHeight;
 		}
-		if(remainingHeightPerPage > 0){
+		if(remainingHeightPerPage > 0){ 
 			clonePfooterSpacer.style.height = remainingHeightPerPage + "px";
 		} else {
-			clonePfooterSpacer.style.height = "0px";
-		}
+            clonePfooterSpacer.style.height = "0px"; 
+        }
 		pFormatElement.appendChild(clonePfooterSpacer);
 	}
-	/***** insert_footer_spacer_while_format_table [end  ] *****/
 }
 
 /**
  * Processes and inserts dummy row items as a footer spacer if the setting is enabled.
- * This function also updates a global-like variable `insert_footer_spacer_while_format_table` to "n".
+ * This function updates layoutState.insertFooterSpacerWhileFormatTable to "n".
  * @param {string} shouldInsertFooterSpacerWithDummy - Flag ("y" or "n") to control insertion.
  * @param {number} heightPerPage - The total height available per page.
  * @param {number} currentPageHeight - The current accumulated height on the page.
- * @param {string} currentRepeatFooterLogo - Flag ("y" or "n") if footer logo is repeated (currently unused in logic here).
- * @param {number} pFooterLogoHeight - Height of the footer logo (currently unused in logic here).
  * @param {HTMLElement} pFormatElement - The main formatting container element.
+ * @param {object} config - The configuration object for the current print form.
+ * @param {object} layoutState - The mutable layout state for the current print form.
  * @returns {number} The updated current page height.
  * @example
- * let newPageHeight = processInsertFooterSpacerWithDummyRowItems("y", 1000, 800, "y", 50, mainFormatDiv);
+ * let newPageHeight = processInsertFooterSpacerWithDummyRowItems("y", 1000, 800, mainFormatDiv, currentConfig, currentLayoutState);
  */
-function processInsertFooterSpacerWithDummyRowItems(shouldInsertFooterSpacerWithDummy, heightPerPage, currentPageHeight, currentRepeatFooterLogo, pFooterLogoHeight, pFormatElement){
-	// console.log("processInsertFooterSpacerWithDummyRowItems : start");
+function processInsertFooterSpacerWithDummyRowItems(shouldInsertFooterSpacerWithDummy, heightPerPage, currentPageHeight, pFormatElement, config, layoutState){
 	let updatedCurrentPageHeight = currentPageHeight;
-	/***** insert_footer_spacer_with_dummy_row_item_while_format_table [start] *****/
 	if(shouldInsertFooterSpacerWithDummy === "y"){
 		let remainingHeightPerPage = heightPerPage - updatedCurrentPageHeight;
-		// console.log("pFormatElement : heightPerPage : "+ heightPerPage);
-		// console.log("pFormatElement : updatedCurrentPageHeight : "+ updatedCurrentPageHeight);
-		// console.log("pFormatElement : remainingHeightPerPage : "+ remainingHeightPerPage);
-		
-		// if(currentRepeatFooterLogo !== "y"){ // This logic seems to be commented out or handled elsewhere
-		//remainingHeightPerPage = remainingHeightPerPage - pFooterLogoHeight;
-		// }
-		// console.log("pFormatElement : updatedCurrentPageHeight : "+ updatedCurrentPageHeight);
-		// console.log("pFormatElement : remainingHeightPerPage : "+ remainingHeightPerPage);
 		if(remainingHeightPerPage > 0){
-			insertDummyRowItems(pFormatElement, remainingHeightPerPage, height_of_dummy_row_item);
-			// console.log("pFormatElement : insertDummyRowItems : "+ remainingHeightPerPage);
-			const remainderForRemainingHeightPerPage = parseFloat((remainingHeightPerPage % height_of_dummy_row_item).toFixed(2));
+			insertDummyRowItems(pFormatElement, remainingHeightPerPage, config.heightOfDummyRowItem, config); 
+			const remainderForRemainingHeightPerPage = parseFloat((remainingHeightPerPage % config.heightOfDummyRowItem).toFixed(2));
 			updatedCurrentPageHeight = heightPerPage - remainderForRemainingHeightPerPage;
 		}
-		
-		insert_footer_spacer_while_format_table = "n"; // Modify the global directly
+		layoutState.insertFooterSpacerWhileFormatTable = "n"; 
 	}
-	/***** insert_footer_spacer_with_dummy_row_item_while_format_table [end  ] *****/
-	const tempValue = parseFloat(updatedCurrentPageHeight.toFixed(2));
-	return tempValue;
+	return parseFloat(updatedCurrentPageHeight.toFixed(2));
 }
 
 /**
  * Processes and inserts dummy row items to fill remaining page height if the setting is enabled.
- * @param {string} shouldInsertDummyRowItems - Flag ("y" or "n") to control insertion.
+ * @param {string} shouldInsertDummyRowItemsFlag - Flag ("y" or "n") from config.insertDummyRowItemWhileFormatTable.
  * @param {number} heightPerPage - The total height available per page.
  * @param {number} currentPageHeight - The current accumulated height on the page.
- * @param {string} currentRepeatFooterLogo - Flag ("y" or "n") if footer logo is repeated (currently unused in logic here).
- * @param {number} pFooterLogoHeight - Height of the footer logo (currently unused in logic here).
  * @param {HTMLElement} pFormatElement - The main formatting container element.
- * @param {number} currentHeightOfDummyRowItem - The height of a single dummy row item.
+ * @param {object} config - The configuration object for the current print form.
  * @returns {number} The updated current page height.
  * @example
- * let newPageHeight = processInsertDummyRowItemsToFillPage("y", 1000, 700, "y", 50, mainFormatDiv, 18);
+ * let newPageHeight = processInsertDummyRowItemsToFillPage(currentConfig.insertDummyRowItemWhileFormatTable, 1000, 700, mainFormatDiv, currentConfig);
  */
-function processInsertDummyRowItemsToFillPage(shouldInsertDummyRowItems, heightPerPage, currentPageHeight, currentRepeatFooterLogo, pFooterLogoHeight, pFormatElement, currentHeightOfDummyRowItem){
-	// console.log("processInsertDummyRowItemsToFillPage : start");
+function processInsertDummyRowItemsToFillPage(shouldInsertDummyRowItemsFlag, heightPerPage, currentPageHeight, pFormatElement, config){
 	let updatedCurrentPageHeight = currentPageHeight;
-	/***** insert_dummy_row_item_while_format_table [start] *****/
-	if(shouldInsertDummyRowItems === "y"){
+	if(shouldInsertDummyRowItemsFlag === "y"){
 		const remainingHeightPerPage = heightPerPage - updatedCurrentPageHeight;
 		if(remainingHeightPerPage > 0){
-			insertDummyRowItems(pFormatElement, remainingHeightPerPage, currentHeightOfDummyRowItem);
-			// console.log("pFormatElement : insertDummyRowItems : "+ remainingHeightPerPage);
-			const remainderForRemainingHeightPerPage = parseFloat((remainingHeightPerPage % currentHeightOfDummyRowItem).toFixed(2));
+			insertDummyRowItems(pFormatElement, remainingHeightPerPage, config.heightOfDummyRowItem, config);
+			const remainderForRemainingHeightPerPage = parseFloat((remainingHeightPerPage % config.heightOfDummyRowItem).toFixed(2));
 			updatedCurrentPageHeight = heightPerPage - remainderForRemainingHeightPerPage;
-			// cl("updatedCurrentPageHeight");
-			// cl(updatedCurrentPageHeight);
 		}
 	}
-	/***** insert_dummy_row_item_while_format_table [end  ] *****/
-	const tempValue = parseFloat(updatedCurrentPageHeight.toFixed(2));
-	return tempValue;
+	return parseFloat(updatedCurrentPageHeight.toFixed(2));
 }
 
 /**
  * Processes and inserts a single dummy row to fill remaining page height if the setting is enabled.
- * @param {string} shouldInsertDummyRow - Flag ("y" or "n") to control insertion.
+ * @param {string} shouldInsertDummyRowFlag - Flag ("y" or "n") from config.insertDummyRowWhileFormatTable.
  * @param {number} heightPerPage - The total height available per page.
  * @param {number} currentPageHeight - The current accumulated height on the page.
- * @param {string} currentRepeatFooterLogo - Flag ("y" or "n") if footer logo is repeated (currently unused in logic here).
- * @param {number} pFooterLogoHeight - Height of the footer logo (currently unused in logic here).
  * @param {HTMLElement} pFormatElement - The main formatting container element.
- * @param {number} currentHeightOfDummyRowItem - The height of a single dummy row item (actually used as height of the single dummy row).
- * @param {number} currentPapersizeWidth - The width of the paper/dummy row.
+ * @param {object} config - The configuration object for the current print form.
  * @returns {number} The updated current page height.
  * @example
- * let newPageHeight = processInsertSingleDummyRowToFillPage("y", 1000, 900, "y", 50, mainFormatDiv, 100, 750);
+ * let newPageHeight = processInsertSingleDummyRowToFillPage(currentConfig.insertDummyRowWhileFormatTable, 1000, 900, mainFormatDiv, currentConfig);
  */
-function processInsertSingleDummyRowToFillPage(shouldInsertDummyRow, heightPerPage, currentPageHeight, currentRepeatFooterLogo, pFooterLogoHeight, pFormatElement, currentHeightOfDummyRowItem, currentPapersizeWidth){
-	// console.log("processInsertSingleDummyRowToFillPage : start");
+function processInsertSingleDummyRowToFillPage(shouldInsertDummyRowFlag, heightPerPage, currentPageHeight, pFormatElement, config){
 	let updatedCurrentPageHeight = currentPageHeight;
-	/***** insert_dummy_row_while_format_table [start] *****/
-	if(shouldInsertDummyRow === "y"){
+	if(shouldInsertDummyRowFlag === "y"){
 		const remainingHeightPerPage = heightPerPage - updatedCurrentPageHeight;
-		
 		if(remainingHeightPerPage > 0){
-			addDummyRow(pFormatElement, currentPapersizeWidth, remainingHeightPerPage);
-			// console.log("pFormatElement : addDummyRow : "+ remainingHeightPerPage);
+			addDummyRow(pFormatElement, config.papersizeWidth, remainingHeightPerPage); 
 			updatedCurrentPageHeight += remainingHeightPerPage;
 		}
 	}
-	/***** insert_dummy_row_while_format_table [end  ] *****/
-	const tempValue = parseFloat(updatedCurrentPageHeight.toFixed(2));
-	return tempValue;
+	return parseFloat(updatedCurrentPageHeight.toFixed(2));
 }
 
 /**
  * Clones and appends a row header element to the formatting container.
  * @param {HTMLElement} pRowHeaderElement - The row header element to clone.
  * @param {HTMLElement} pFormatElement - The main formatting container element.
- * @example
- * addRowHeaderElement(rowHeaderDiv, mainFormatDiv);
  */
 function addRowHeaderElement(pRowHeaderElement, pFormatElement){
+	if (!pRowHeaderElement) return; // Guard clause
 	const cloneProwheader = pRowHeaderElement.cloneNode(true);
 	pFormatElement.appendChild(cloneProwheader);
-	// console.log("pFormatElement : prowheader");
 }
 
 /**
  * Clones and appends a header element to the formatting container.
  * @param {HTMLElement} pHeaderElement - The header element to clone.
  * @param {HTMLElement} pFormatElement - The main formatting container element.
- * @example
- * addHeaderElement(headerDiv, mainFormatDiv);
  */
 function addHeaderElement(pHeaderElement, pFormatElement){
+	if (!pHeaderElement) return; // Guard clause
 	const clonePheader = pHeaderElement.cloneNode(true);
 	pFormatElement.appendChild(clonePheader);
-	// console.log("pFormatElement : pheader");
 }
 
 /**
  * Clones and appends a footer element to the formatting container.
  * @param {HTMLElement} pFooterElement - The footer element to clone.
  * @param {HTMLElement} pFormatElement - The main formatting container element.
- * @example
- * addFooterElement(footerDiv, mainFormatDiv);
  */
 function addFooterElement(pFooterElement, pFormatElement){
+	if (!pFooterElement) return; // Guard clause
 	const clonePfooter = pFooterElement.cloneNode(true);
 	pFormatElement.appendChild(clonePfooter);
-	// console.log("pFormatElement : pfooter");
 }
 
 /**
  * Clones and appends a footer logo element to the formatting container.
  * @param {HTMLElement} pFooterLogoElement - The footer logo element to clone.
  * @param {HTMLElement} pFormatElement - The main formatting container element.
- * @example
- * addFooterLogoElement(footerLogoDiv, mainFormatDiv);
  */
 function addFooterLogoElement(pFooterLogoElement, pFormatElement){
+	if (!pFooterLogoElement) return; // Guard clause
 	const clonePfooterLogo = pFooterLogoElement.cloneNode(true);
 	pFormatElement.appendChild(clonePfooterLogo);
-	// console.log("pFormatElement : pfooter_logo");
 }
 
 /**
  * Clones and appends a document info element to the formatting container.
  * @param {HTMLElement} pDocInfoElement - The document info element to clone.
  * @param {HTMLElement} pFormatElement - The main formatting container element.
- * @example
- * addDocInfoElement(docInfoDiv, mainFormatDiv);
  */
 function addDocInfoElement(pDocInfoElement, pFormatElement){
+	if (!pDocInfoElement) return; // Guard clause
 	const clonePdocinfo = pDocInfoElement.cloneNode(true);
 	pFormatElement.appendChild(clonePdocinfo);
-	// console.log("pFormatElement : pdocinfo");
 }
 
 /**
  * Clones and appends a page break element to the formatting container.
  * @param {HTMLElement} divPageBreakBeforeElement - The page break element to clone.
  * @param {HTMLElement} pFormatElement - The main formatting container element.
- * @example
- * addPageBreakElement(pageBreakDiv, mainFormatDiv);
  */
 function addPageBreakElement(divPageBreakBeforeElement, pFormatElement){
+	if (!divPageBreakBeforeElement) return; // Guard clause
 	const cloneDivPageBreakBefore = divPageBreakBeforeElement.cloneNode(true);
 	pFormatElement.appendChild(cloneDivPageBreakBefore);
-	// console.log("pFormatElement : div_page_break_before");
 }
 
 /**
@@ -329,26 +278,22 @@ function addPageBreakElement(divPageBreakBeforeElement, pFormatElement){
  * @param {NodeListOf<HTMLElement>} pRowItemElements - A NodeList of all row item elements.
  * @param {number} itemIndex - The index of the row item to clone and append.
  * @param {HTMLElement} pFormatElement - The main formatting container element.
- * @example
- * addRowItemElement(allRowItems, 0, mainFormatDiv);
  */
 function addRowItemElement(pRowItemElements, itemIndex, pFormatElement){
+	if (!pRowItemElements || !pRowItemElements[itemIndex]) return; // Guard clause
 	const cloneProwitem = pRowItemElements[itemIndex].cloneNode(true);
 	pFormatElement.appendChild(cloneProwitem);
-	// console.log("pFormatElement : prowitem " + itemIndex);
 }
 
 /**
  * Adds a "_processed" suffix to the class name of a given element.
  * @param {HTMLElement} inputElement - The DOM element to modify.
  * @param {string} inputClassName - The original class name.
- * @example
- * addProcessedSuffixToClassName(myElement, "item"); // myElement class becomes "item_processed"
  */
 function addProcessedSuffixToClassName(inputElement, inputClassName){
+	if (!inputElement) return; // Guard clause
 	const tempClassName = inputClassName;
 	const tempClassNameNew = inputClassName + "_processed";
-	
 	inputElement.classList.remove(tempClassName);
 	inputElement.classList.add(tempClassNameNew);
 }
@@ -359,8 +304,6 @@ function addProcessedSuffixToClassName(inputElement, inputClassName){
  * @async
  */
 async function printform_process(printformElement){
-	
-	// Read configuration from data-* attributes of printformElement
 	const config = {
 		repeatHeader: getConfigValue(printformElement, 'repeatHeader', "y", 'booleanYN'),
 		repeatDocinfo: getConfigValue(printformElement, 'repeatDocinfo', "y", 'booleanYN'),
@@ -376,30 +319,17 @@ async function printform_process(printformElement){
 		heightOfDummyRowItem: getConfigValue(printformElement, 'heightOfDummyRowItem', 18, 'number')
 	};
 
-	// Mutable state for the current print form processing cycle
 	let layoutState = {
 		insertFooterSpacerWhileFormatTable: getConfigValue(printformElement, 'insertFooterSpacerWhileFormatTable', "y", 'booleanYN')
 	};
 
 	return new Promise(resolve => {
-		
-		// const printform = document.querySelector(".printform"); // This will now be printformElement
-		let pformat = document.createElement('div');
-		pformat.classList.add("printform_formatter");
-		printformElement.parentNode.insertBefore(pformat, printformElement);
-		pformat = document.querySelector(".printform_formatter"); // This might need to be scoped if multiple run async
-		// For now, assuming processAllPrintforms runs them sequentially enough.
-		// A safer way: pformat should be directly used, not re-queried globally.
-		// Let's correct this:
-		// Corrected pformat handling:
 		const parentOfPrintform = printformElement.parentNode;
-		const newPformat = document.createElement('div');
-		newPformat.classList.add("printform_formatter");
-		parentOfPrintform.insertBefore(newPformat, printformElement);
-		// pformat is now newPformat
+		const pformat = document.createElement('div');
+		pformat.classList.add("printform_formatter");
+		parentOfPrintform.insertBefore(pformat, printformElement);
 
 		const pheader = printformElement.querySelector(".pheader");
-		// Ensure pheader exists before getting its height
 		const ph_height = pheader ? parseFloat(pheader.getBoundingClientRect().height.toFixed(2)) : 0;
 		
 		const pdocinfo = printformElement.querySelector(".pdocinfo");
@@ -415,17 +345,8 @@ async function printform_process(printformElement){
 		const pfl_height = pfooter_logo ? parseFloat(pfooter_logo.getBoundingClientRect().height.toFixed(2)) : 0;
 		
 		const prowitem = printformElement.querySelectorAll(".prowitem");
-		let pr_height = 0;
 		let temp_item_height;
-		for( let i = 0; i < prowitem.length ; i++){
-			temp_item_height = parseFloat(prowitem[i].getBoundingClientRect().height.toFixed(2));
-			if(temp_item_height !== 0){
-				pr_height += temp_item_height;
-			}
-		}
-		// console.log("pr_height : " + pr_height);
-		
-		
+
 		const pfooter_spacer = document.createElement('div');
 		pfooter_spacer.classList.add("pfooter_spacer");
 		pfooter_spacer.classList.add("paper_width");
@@ -436,33 +357,15 @@ async function printform_process(printformElement){
 		div_page_break_before.style.pageBreakBefore = "always";
 		div_page_break_before.style.height = '0px';
 		
-		/***** Generate Page [start] *****/
 		let current_page_height = 0;
-		let height_per_page = 0;
+		let height_per_page = config.papersizeHeight;
 		let tb_page_break_before_yn = "n";
 		
-		height_per_page = config.papersizeHeight;
-		if(config.repeatHeader === "y"){
-			// console.log("ph_height : " + ph_height);
-			height_per_page -= ph_height;
-		}
-		if(config.repeatDocinfo === "y"){
-			// console.log("pdi_height : " + pdi_height);
-			height_per_page -= pdi_height;
-		}
-		if(config.repeatRowheader === "y"){
-			// console.log("prh_height : " + prh_height);
-			height_per_page -= prh_height;
-		}
-		if(config.repeatFooter === "y"){
-			// console.log("pf_height : " + pf_height);
-			height_per_page -= pf_height;
-		}
-		if(config.repeatFooterLogo === "y"){
-			// console.log("pfl_height : " + pfl_height);
-			height_per_page -= pfl_height;
-		}
-		// console.log("height_per_page : " + height_per_page);
+		if(config.repeatHeader === "y") height_per_page -= ph_height;
+		if(config.repeatDocinfo === "y") height_per_page -= pdi_height;
+		if(config.repeatRowheader === "y") height_per_page -= prh_height;
+		if(config.repeatFooter === "y") height_per_page -= pf_height;
+		if(config.repeatFooterLogo === "y") height_per_page -= pfl_height;
 		
 		addProcessedSuffixToClassName(pheader, "pheader");
 		addProcessedSuffixToClassName(pdocinfo, "pdocinfo");
@@ -470,249 +373,111 @@ async function printform_process(printformElement){
 		addProcessedSuffixToClassName(pfooter, "pfooter");
 		addProcessedSuffixToClassName(pfooter_logo, "pfooter_logo");
 		
-		// Loop all row item [start]
 		for( let i = 0; i < prowitem.length ; i ++){
 			temp_item_height = parseFloat(prowitem[i].getBoundingClientRect().height.toFixed(2));
 			
 			if(current_page_height === 0){
 				addHeaderElement(pheader, pformat);
-				if(config.repeatHeader === "y"){
-					
-				}else{
-					current_page_height += ph_height;
-				}
+				if(config.repeatHeader !== "y") current_page_height += ph_height;
 				
 				addDocInfoElement(pdocinfo, pformat);
-				
-				if(config.repeatDocinfo === "y"){
-					
-				}else{
-					current_page_height += pdi_height;
-				}
+				if(config.repeatDocinfo !== "y") current_page_height += pdi_height;
 				
 				addRowHeaderElement(prowheader, pformat);
-				if(config.repeatRowheader === "y"){
-					
-				}else{
-					current_page_height += prh_height;
-				}
+				if(config.repeatRowheader !== "y") current_page_height += prh_height;
 			}
 			
 			current_page_height += temp_item_height;
-			
 			addProcessedSuffixToClassName(prowitem[i], "prowitem");
 			
 			if (prowitem[i].classList.contains('tb_page_break_before')) {
 				tb_page_break_before_yn = "y";
 			}
-			if(tb_page_break_before_yn === "y"){
-				
+
+			if(tb_page_break_before_yn === "y" || current_page_height > height_per_page){
 				current_page_height -= temp_item_height;
 				
-				current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
-
-				current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
+				current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, pformat, config);
+				current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, pformat, config);
 				
-				let previous_insert_footer_spacer_while_format_table = layoutState.insertFooterSpacerWhileFormatTable;
-				current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-				let useProcessInsertFooterSpacer = true;
-				if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y" && previous_insert_footer_spacer_while_format_table === "y") {
-					if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y") {
-						 useProcessInsertFooterSpacer = false;
-					}
-				}
-
-				if(useProcessInsertFooterSpacer){
-					processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-				}
+				current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, pformat, config, layoutState);
+                processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 				
-				if(config.repeatFooter === "y"){
-					addFooterElement(pfooter, pformat);
-				}
-				
-				if(config.repeatFooterLogo === "y"){
-					addFooterLogoElement(pfooter_logo, pformat);
-				}
+				if(config.repeatFooter === "y") addFooterElement(pfooter, pformat);
+				if(config.repeatFooterLogo === "y") addFooterLogoElement(pfooter_logo, pformat);
 				
 				addPageBreakElement(div_page_break_before, pformat);
+				current_page_height = 0; // Reset for new page
+
+				if(config.repeatHeader === "y") addHeaderElement(pheader, pformat);
+				 // else if not repeating, its height is not added to new page's current_page_height yet.
+
+				if(config.repeatDocinfo === "y") addDocInfoElement(pdocinfo, pformat);
 				
-				if(config.repeatHeader === "y"){
-					addHeaderElement(pheader, pformat);
-				}
-				
-				if(config.repeatDocinfo === "y"){
-					addDocInfoElement(pdocinfo, pformat);
-				}
-				
-				if(config.repeatRowheader === "y"){
-					addRowHeaderElement(prowheader, pformat);
-				}
+				if(config.repeatRowheader === "y") addRowHeaderElement(prowheader, pformat);
 				
 				addRowItemElement(prowitem, i, pformat);
-				
-				current_page_height = temp_item_height;
+				current_page_height += temp_item_height; 
 				tb_page_break_before_yn = "n";
-			}else{
-				if(current_page_height <= height_per_page){
-					addRowItemElement(prowitem, i, pformat);
-				}else{
-					current_page_height -= temp_item_height;
-					
-					current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
-					
-					current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
-					
-					current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-					
-					processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-					
-					if(config.repeatFooter === "y"){
-						addFooterElement(pfooter, pformat);
-					}
-					
-					if(config.repeatFooterLogo === "y"){
-						addFooterLogoElement(pfooter_logo, pformat);
-					}
-					
-					addPageBreakElement(div_page_break_before, pformat);
-					
-					if(config.repeatHeader === "y"){
-						addHeaderElement(pheader, pformat);
-					}
-					
-					if(config.repeatDocinfo === "y"){
-						addDocInfoElement(pdocinfo, pformat);
-					}
-					
-					if(config.repeatRowheader === "y"){
-						addRowHeaderElement(prowheader, pformat);
-					}
-					
-					addRowItemElement(prowitem, i, pformat);
-					
-					current_page_height = temp_item_height;
-				}
+			} else { 
+				addRowItemElement(prowitem, i, pformat);
 			}
-			
 		}
-		// Loop all row item [end  ]
 		
-		// Last Footer [start]
 		let spaceNeededForLastFooter = 0;
 		if (config.repeatFooter !== "y") spaceNeededForLastFooter += pf_height;
 		if (config.repeatFooterLogo !== "y") spaceNeededForLastFooter += pfl_height;
 		
 		if((current_page_height + spaceNeededForLastFooter) <= height_per_page){
-			current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
+			current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, pformat, config);
+			current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, pformat, config);
 			
-			current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
-			
-			let previous_insert_footer_spacer_while_format_table_last = layoutState.insertFooterSpacerWhileFormatTable;
-			current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-			let useProcessInsertFooterSpacerLast = true;
-			if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y" && previous_insert_footer_spacer_while_format_table_last === "y") {
-				 if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y") {
-					useProcessInsertFooterSpacerLast = false;
-				 }
-			}
-			if(useProcessInsertFooterSpacerLast){
-				processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-			}
+			current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, pformat, config, layoutState);
+            processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 			
 			addFooterElement(pfooter, pformat);
 			addFooterLogoElement(pfooter_logo, pformat);
 		}else{
-			current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
-			current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
+			current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, pformat, config);
+			current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, pformat, config);
 			
-			let previous_insert_footer_spacer_while_format_table_split = layoutState.insertFooterSpacerWhileFormatTable;
-			current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-			let useProcessInsertFooterSpacerSplit = true;
-			 if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y" && previous_insert_footer_spacer_while_format_table_split === "y") {
-				 if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y") {
-					useProcessInsertFooterSpacerSplit = false;
-				 }
-			}
-			if(useProcessInsertFooterSpacerSplit){
-				processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-			}
+			current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, pformat, config, layoutState);
+            processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 
-			if(config.repeatFooter === "y"){
-				addFooterElement(pfooter, pformat);
-			}
-			if(config.repeatFooterLogo === "y"){
-				addFooterLogoElement(pfooter_logo, pformat);
-			}
+			if(config.repeatFooter === "y") addFooterElement(pfooter, pformat);
+			if(config.repeatFooterLogo === "y") addFooterLogoElement(pfooter_logo, pformat);
 					
 			addPageBreakElement(div_page_break_before, pformat);
-			
 			current_page_height = 0;
 			
+			if(config.repeatHeader === "y") addHeaderElement(pheader, pformat);
+			if(config.repeatDocinfo === "y") addDocInfoElement(pdocinfo, pformat);
+			if(config.repeatRowheader === "y") addRowHeaderElement(prowheader, pformat);
 			
-			if(config.repeatHeader === "y"){
-				addHeaderElement(pheader, pformat);
-			}else{
-				
-			}
+			// Add the actual footer elements that were pushed to the new page.
+			// Their heights contribute to current_page_height on this new page.
+			current_page_height += pf_height;  
+			current_page_height += pfl_height; 
 			
-			if(config.repeatDocinfo === "y"){
-				addDocInfoElement(pdocinfo, pformat);
-			}else{
-				
-			}
+			current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, pformat, config);
+			current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, pformat, config);
 			
-			if(config.repeatRowheader === "y"){
-				addRowHeaderElement(prowheader, pformat);
-			}else{
-				
-			}
-			
-			if(config.repeatFooter === "y"){
-				current_page_height -= pf_height;
-			}
-			if(config.repeatFooterLogo === "y"){
-				current_page_height -= pfl_height;
-			}
-			
-			current_page_height += pf_height;
-			current_page_height += pfl_height;
-			
-			current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
-			current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
-			
-			let previous_insert_footer_spacer_while_format_table_final = layoutState.insertFooterSpacerWhileFormatTable;
-			current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-			let useProcessInsertFooterSpacerFinal = true;
-			if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y" && previous_insert_footer_spacer_while_format_table_final === "y") {
-				if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y") {
-					useProcessInsertFooterSpacerFinal = false;
-				}
-			}
-			if(useProcessInsertFooterSpacerFinal){
-				processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
-			}
+			current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, pformat, config, layoutState);
+            processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 			
 			addFooterElement(pfooter, pformat);
 			addFooterLogoElement(pfooter_logo, pformat);
 		}
-		// Last Footer [end  ]
 		
-		
-		addProcessedSuffixToClassName(newPformat, "printform_formatter");
-		
-		printformElement.style.display = 'none'; // Hide original, don't remove yet if pformat is based on global query
-		// printformElement.remove(); // Original logic
-		// console.log("printform : remove");
+		addProcessedSuffixToClassName(pformat, "printform_formatter");
+		printformElement.remove();
 		resolve();
 	});
 }
-/***** Generate Page [end  ] *****/
 
 /**
  * Helper function for logging to console.
  * @param {*} logMessage - The message or object to log.
- * @example
- * cl("This is a test log.");
  */
 function cl(logMessage){ console.log(logMessage); }
 
@@ -720,17 +485,14 @@ function cl(logMessage){ console.log(logMessage); }
  * Pauses execution for a specified number of milliseconds.
  * @param {number} timeInMilliseconds - The duration to pause in milliseconds.
  * @returns {Promise<void>} A promise that resolves after the specified time.
- * @example
- * await pause(1000); // Pauses for 1 second
  */
-function pause(timeInMilliseconds) {
-	function pauseTheFunction(resolve, reject) {
+function pause(timeInMilliseconds) { 
+	function pauseTheFunction(resolve, reject) { 
 		if (typeof timeInMilliseconds === 'number' && timeInMilliseconds > 0) {
-			// console.log("pause for "+ (timeInMilliseconds/1000)+" seconds");
 			setTimeout(resolve, timeInMilliseconds);
 		} else {
 			console.error("Error: Invalid time value for pause function.");
-			reject(new Error("Invalid time value for pause function."));
+			reject(new Error("Invalid time value for pause function.")); 
 		}
 	}
 	return new Promise(pauseTheFunction);
@@ -739,33 +501,25 @@ function pause(timeInMilliseconds) {
 /**
  * Processes all elements with the class "printform" sequentially.
  * @async
- * @example
- * await processAllPrintforms();
  */
 async function processAllPrintforms() { 
-	const printformElements = document.querySelectorAll(".printform"); // Renamed for clarity
-	const numberOfPrintforms =  printformElements.length;
-	// console.log(numberOfPrintforms);
-	for(let i = 0; i < numberOfPrintforms; i++){
-		const currentPrintformElement = printformElements[i];
+	const printformElements = document.querySelectorAll(".printform");
+	for(let i = 0; i < printformElements.length; i++){
+        const currentPrintformElement = printformElements[i];
 		try{
-			await pause(1); 
-		} catch(error){
-			console.error("pause error:", error); 
-		}
+            await pause(1); 
+        } catch(error){
+            console.error("pause error:", error); 
+        }
 		try{
-			await printform_process(currentPrintformElement); // Pass the element
-		} catch(error){
-			console.error("printform_process error for element:", currentPrintformElement, "error:", error); 
-		}
+            await printform_process(currentPrintformElement);
+        } catch(error){
+            console.error("printform_process error for element:", currentPrintformElement, "error:", error); 
+        }
 	}
 }
 
-// let runFunctionSequentiallyProcessed = false; // This flag might need to be managed differently if multiple sets of forms can appear. For now, assume one-time onload.
-// Make it a const if it's truly a one-time check. If re-processing can happen, this needs thought.
-// For now, keeping it simple:
 let hasProcessedOnLoad = false; 
-
 
 window.onload = function() {
     if(hasProcessedOnLoad === false){ 
