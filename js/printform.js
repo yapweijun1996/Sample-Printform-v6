@@ -272,10 +272,19 @@ async function printform_process(formEl, config){
 	custom_dummy_row_item_content = customDummyRowItemContent;
 	// Use the passed element
 	const printform = formEl;
-	var pformat = document.createElement('div');
-	pformat.classList.add("printform_formatter");
-	printform.parentNode.insertBefore(pformat, printform);
-	pformat = document.querySelector(".printform_formatter");
+	
+	// initialize pages and first page wrapper
+	const pages = [];
+	const parentNode = formEl.parentNode;
+	function createPageWrapper() {
+		const wrapper = document.createElement('div');
+		wrapper.classList.add('printform_formatter', 'printform_page');
+		wrapper.style.pageBreakAfter = 'always';
+		parentNode.insertBefore(wrapper, formEl);
+		pages.push(wrapper);
+		return wrapper;
+	}
+	let pformat = createPageWrapper();
 	
 	var pheader = printform.querySelector(".pheader");
 	var ph_height = parseFloat(pheader.getBoundingClientRect().height.toFixed(2));
@@ -420,6 +429,7 @@ async function printform_process(formEl, config){
 			}
 			
 			addDivPageBreakBefore(div_page_break_before, pformat);
+			pformat = createPageWrapper();
 			
 			if(repeat_header == "y"){
 				addHeader(pheader, pformat);
@@ -460,6 +470,7 @@ async function printform_process(formEl, config){
 				}
 				
 				addDivPageBreakBefore(div_page_break_before, pformat);
+				pformat = createPageWrapper();
 				
 				if(repeat_header == "y"){
 					addHeader(pheader, pformat);
@@ -541,6 +552,7 @@ async function printform_process(formEl, config){
 				
 		// Last Second Page Footer [end  ] 
 		addDivPageBreakBefore(div_page_break_before, pformat);
+		pformat = createPageWrapper();
 		
 		// Last Page Footer [start] 
 		current_page_height = 0;
