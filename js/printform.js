@@ -1,54 +1,72 @@
 /****** Setting [start] ******/
-let repeat_header = repeat_header || "y";
-let repeat_docinfo = repeat_docinfo || "y";
-let repeat_rowheader = repeat_rowheader || "y";
-let repeat_footer = repeat_footer || "n";
-let repeat_footer_logo = repeat_footer_logo || "n";
-let insert_dummy_row_item_while_format_table = insert_dummy_row_item_while_format_table || "y";
-let insert_dummy_row_while_format_table = insert_dummy_row_while_format_table || "n";
-let insert_footer_spacer_while_format_table = insert_footer_spacer_while_format_table || "y";
-let insert_footer_spacer_with_dummy_row_item_while_format_table = insert_footer_spacer_with_dummy_row_item_while_format_table || "y";
-let custom_dummy_row_item_content = custom_dummy_row_item_content || "";
+var repeat_header = repeat_header || "y";
+var repeat_docinfo = repeat_docinfo || "y";
+var repeat_rowheader = repeat_rowheader || "y";
+var repeat_footer = repeat_footer || "n";
+var repeat_footer_logo = repeat_footer_logo || "n";
+var insert_dummy_row_item_while_format_table = insert_dummy_row_item_while_format_table || "y";
+var insert_dummy_row_while_format_table = insert_dummy_row_while_format_table || "n";
+var insert_footer_spacer_while_format_table = insert_footer_spacer_while_format_table || "y";
+var insert_footer_spacer_with_dummy_row_item_while_format_table = insert_footer_spacer_with_dummy_row_item_while_format_table || "y";
+var custom_dummy_row_item_content = custom_dummy_row_item_content || "";
 
 // Assuming vle_temp_paper_width and vle_temp_paper_height are defined somewhere
-let papersize_width = papersize_width || 750; // Default to 795px (A4 width)
-let papersize_height = papersize_height || 1050; // Default to a standard A4 height (1122px)
-let height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
+var papersize_width = papersize_width || 750; // Default to 795px (A4 width)
+var papersize_height = papersize_height || 1050; // Default to a standard A4 height (1122px)
+var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
 /****** Setting [end  ] ******/
 
-// Insert createSpacer helper to DRY dummy-row logic
-function createSpacer({ targetElement, height, className, width, content }) {
-	const spacer = document.createElement('table');
-	spacer.className = className;
-	spacer.setAttribute('width', width + 'px');
-	spacer.setAttribute('cellspacing', '0');
-	spacer.setAttribute('cellpadding', '0');
-	if (content) {
-		spacer.innerHTML = content;
-	} else {
-		spacer.innerHTML = `<tr style='height:${height}px;'><td style="border:0px solid black;"></td></tr>`;
-	}
-	targetElement.appendChild(spacer);
-}
 
-// Refactor add_dummy_row to use createSpacer
 function add_dummy_row(target_element, papersize_width, height_of_dummy_row){
-	createSpacer({ targetElement: target_element, height: height_of_dummy_row, className: 'dummy_row', width: papersize_width });
+	
+	var dummy_row_item_table = document.createElement('table');
+	dummy_row_item_table.className = 'dummy_row';
+	dummy_row_item_table.setAttribute('width', papersize_width + 'px');
+	dummy_row_item_table.setAttribute('cellspacing', '0');
+	dummy_row_item_table.setAttribute('cellpadding', '0');
+	
+	var dummy_row_item_inner_html = `
+	<tr style='height:`+height_of_dummy_row+`px;'>
+		<td style="border:0px solid black;"></td>
+	</tr>
+	`;
+	dummy_row_item_table.innerHTML = dummy_row_item_inner_html;
+	//target_element.insertAdjacentElement('beforebegin', dummy_row_item_table)
+	target_element.appendChild(dummy_row_item_table);
 }
-
-// Refactor add_dummy_row_item to use createSpacer
 function add_dummy_row_item(target_element, height_of_dummy_row_item){
-	var content = (typeof custom_dummy_row_item_content !== "undefined" && custom_dummy_row_item_content !== "") ? custom_dummy_row_item_content : null;
-	createSpacer({ targetElement: target_element, height: height_of_dummy_row_item, className: 'dummy_row_item', width: papersize_width, content: content });
+	
+	var dummy_row_item_table = document.createElement('table');
+	dummy_row_item_table.className = 'dummy_row_item';
+	dummy_row_item_table.setAttribute('width', papersize_width + 'px');
+	dummy_row_item_table.setAttribute('cellspacing', '0');
+	dummy_row_item_table.setAttribute('cellpadding', '0');
+	
+	var dummy_row_item_inner_html = `
+	<tr style='height:`+height_of_dummy_row_item+`px;'>
+		<td style="border:0px solid black;"></td>
+	</tr>
+	`;
+	
+	if(typeof custom_dummy_row_item_content !== "undefined"){
+		if(custom_dummy_row_item_content != ""){
+			dummy_row_item_inner_html = custom_dummy_row_item_content;
+		}
+	}
+	dummy_row_item_table.innerHTML = dummy_row_item_inner_html;
+	//target_element.insertAdjacentElement('beforebegin', dummy_row_item_table)
+	target_element.appendChild(dummy_row_item_table);
 }
-
 function insert_dummy_row_item(target_element, diff_height_from_papersize, height_of_dummy_row){
-	if (diff_height_from_papersize > 0) {
-		const count = Math.floor(diff_height_from_papersize / height_of_dummy_row);
-		for (let i = 0; i < count; i++) {
+	// Add spacer [start] insert dummy row item
+	if(diff_height_from_papersize > 0){
+		var number_of_dummy_row_item_will_be_insert = 0;
+		number_of_dummy_row_item_will_be_insert = Math.floor(diff_height_from_papersize / height_of_dummy_row);
+		for( var i = 0 ; i < number_of_dummy_row_item_will_be_insert ; i++){
 			add_dummy_row_item(target_element, height_of_dummy_row);
 		}
 	}
+	// Add spacer [end  ] insert dummy row item
 }
 
 function process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat){
@@ -94,8 +112,8 @@ function process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(
 		insert_footer_spacer_while_format_table = "n";
 	}
 	/***** insert_footer_spacer_with_dummy_row_item_while_format_table [end  ] *****/
-	const tempValue = parseFloat(current_page_height.toFixed(2));
-	return tempValue;
+	var temp_value = parseFloat((current_page_height).toFixed(2));
+	return temp_value;
 }
 
 function process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item){
@@ -113,8 +131,8 @@ function process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_it
 		}
 	}
 	/***** insert_dummy_row_item_while_format_table [end  ] *****/
-	const tempValue = parseFloat(current_page_height.toFixed(2));
-	return tempValue;
+	var temp_value = parseFloat((current_page_height).toFixed(2));
+	return temp_value;
 }
 
 function process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width){
@@ -130,8 +148,8 @@ function process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_f
 		}
 	}
 	/***** insert_dummy_row_while_format_table [end  ] *****/
-	const tempValue = parseFloat(current_page_height.toFixed(2));
-	return tempValue;
+	var temp_value = parseFloat((current_page_height).toFixed(2));
+	return temp_value;
 }
 
 function addRowHeader(prowheader, pformat){
@@ -177,11 +195,11 @@ function addRowItem(prowitem, temp_no, pformat){
 }
 
 function addProcessedInClassName(input_ele, input_classname){
-	const tempClassName = input_classname;
-	const tempClassNameNew = `${input_classname}_processed`;
+	var temp_class_name = input_classname;
+	var temp_class_name_new = input_classname + "_processed";
 	
-	input_ele.classList.remove(tempClassName);
-	input_ele.classList.add(tempClassNameNew);
+	input_ele.classList.remove(temp_class_name);
+	input_ele.classList.add(temp_class_name_new);
 }
 
 
@@ -534,40 +552,20 @@ function pause_in_milliseconds(time) {
 }
 
 async function run_function_sequentially() {
-	const printforms = document.querySelectorAll(".printform");
-	const count = printforms.length;
-	console.log(count);
-	for (let i = 0; i < count; i++) {
+	var printform = document.querySelectorAll(".printform");
+	var prinbform_no =  printform.length;
+	console.log(prinbform_no);
+	for(var i = 0; i < prinbform_no; i ++){
 		try{await pause_in_milliseconds(1);}catch(error){console.error("pause_in_milliseconds error");}
 		try{await printform_process();}     catch(error){console.error("printform_process error");}
 	}
 }
 
-let run_function_sequentially_processed = false;
+if(!run_function_sequentially_processed){ var run_function_sequentially_processed = false; }
 
-// ES module: expose init and render functions
-export function initPrintFormOptions(opts = {}) {
-    if (opts.repeatHeader !== undefined) repeat_header = opts.repeatHeader ? "y" : "n";
-    if (opts.repeatDocInfo !== undefined) repeat_docinfo = opts.repeatDocInfo ? "y" : "n";
-    if (opts.repeatRowHeader !== undefined) repeat_rowheader = opts.repeatRowHeader ? "y" : "n";
-    if (opts.repeatFooter !== undefined) repeat_footer = opts.repeatFooter ? "y" : "n";
-    if (opts.repeatFooterLogo !== undefined) repeat_footer_logo = opts.repeatFooterLogo ? "y" : "n";
-    if (opts.insertDummyRowItem !== undefined) insert_dummy_row_item_while_format_table = opts.insertDummyRowItem ? "y" : "n";
-    if (opts.insertDummyRow !== undefined) insert_dummy_row_while_format_table = opts.insertDummyRow ? "y" : "n";
-    if (opts.insertFooterSpacer !== undefined) insert_footer_spacer_while_format_table = opts.insertFooterSpacer ? "y" : "n";
-    if (opts.insertFooterSpacerWithDummy !== undefined) insert_footer_spacer_with_dummy_row_item_while_format_table = opts.insertFooterSpacerWithDummy ? "y" : "n";
-    if (opts.customDummyRowContent !== undefined) custom_dummy_row_item_content = opts.customDummyRowContent;
-    if (opts.papersizeWidth !== undefined) papersize_width = opts.papersizeWidth;
-    if (opts.papersizeHeight !== undefined) papersize_height = opts.papersizeHeight;
-    if (opts.dummyRowHeight !== undefined) height_of_dummy_row_item = opts.dummyRowHeight;
-}
-
-export async function renderPrintForms(options = {}) {
-    initPrintFormOptions(options);
-    if (!run_function_sequentially_processed) {
-        await run_function_sequentially();
-        run_function_sequentially_processed = true;
-    }
-}
-
-export default { initPrintFormOptions, renderPrintForms };
+window.onload = function() {
+    if(run_function_sequentially_processed == false){
+		run_function_sequentially();
+		run_function_sequentially_processed = true;
+	}
+};

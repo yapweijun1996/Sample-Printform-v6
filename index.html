@@ -11,7 +11,7 @@
 				padding: 0px;
 			}
 			.paper_width{
-				width:795px;
+				width:396px;
 			}
 			td{
 				line-height:18px;
@@ -19,8 +19,8 @@
 		</style>
 		
 		<script>
-			var papersize_width = 795; // 795px is A4 width, 6.35mm is 24px
-			var papersize_height = 1050;
+			var papersize_width = 396; // 795px is A4 width, 6.35mm is 24px
+			var papersize_height = 550;
 			var height_of_dummy_row_item = 27;
 			
 			var repeat_header                                                = "y";
@@ -66,10 +66,11 @@
 		<div class="paper_width printform">
 			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pheader">
 				<tr>
-					<td style="box-sizing:border-box;width:0px;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
 					<td style="box-sizing:border-box;width:inherit;"></td>
-					<td style="box-sizing:border-box;width:0px;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
 				</tr>
+				<tr style="height:10px;"></tr>
 				<tr>
 					<td style="box-sizing:border-box;"></td>
 					<td style="box-sizing:border-box;">
@@ -509,9 +510,9 @@
 			
 			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pfooter_logo">
 				<tr>
-					<td style="box-sizing:border-box;width:0px;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
 					<td style="box-sizing:border-box;width:inherit;"></td>
-					<td style="box-sizing:border-box;width:0px;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
 				</tr>
 				<tr>
 					<td style="box-sizing:border-box;"></td>
@@ -523,10 +524,6 @@
 				</tr>
 			</table>
 		</div>
-
-		<script>
-			var repeat_footer = "n";
-		</script>
 		<script src="./js/printform.js"></script>
 		
 		<!-- extra tools [start] -->
