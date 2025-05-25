@@ -563,9 +563,7 @@ async function run_function_sequentially() {
 
 if(!run_function_sequentially_processed){ var run_function_sequentially_processed = false; }
 
-window.onload = function() {
-    if(run_function_sequentially_processed == false){
-		run_function_sequentially();
-		run_function_sequentially_processed = true;
-	}
-};
+if(run_function_sequentially_processed == false){
+	run_function_sequentially();
+	run_function_sequentially_processed = true;
+}
