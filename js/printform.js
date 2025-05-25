@@ -19,6 +19,11 @@ var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
 // [INJECT] Read per-form config from data-* attributes
 function getPrintformConfig(formEl) {
 	const ds = formEl.dataset;
+	// if user provided a <template> override, use its content
+	const tmpl = formEl.querySelector('template.custom-dummy-row-item-content');
+	const customDummyRowItemContent = tmpl
+		? tmpl.innerHTML.trim()
+		: ('customDummyRowItemContent' in ds ? ds.customDummyRowItemContent : custom_dummy_row_item_content);
 	return {
 		papersizeWidth: ds.papersizeWidth ? +ds.papersizeWidth : papersize_width,
 		papersizeHeight: ds.papersizeHeight ? +ds.papersizeHeight : papersize_height,
@@ -40,9 +45,7 @@ function getPrintformConfig(formEl) {
 		insertFooterSpacerWithDummyRowItemWhileFormatTable: ds.insertFooterSpacerWithDummyRowItemWhileFormatTable
 			? ds.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y"
 			: insert_footer_spacer_with_dummy_row_item_while_format_table === "y",
-		customDummyRowItemContent: 'customDummyRowItemContent' in ds
-			? ds.customDummyRowItemContent
-			: custom_dummy_row_item_content
+		customDummyRowItemContent
 	};
 }
 
