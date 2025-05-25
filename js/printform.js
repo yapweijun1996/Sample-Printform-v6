@@ -203,11 +203,11 @@ function addProcessedInClassName(input_ele, input_classname){
 }
 
 
-function printform_process(){
+function printform_process(printformEl){
 	
 	return new Promise(resolve => {
 		
-		var printform = document.querySelector(".printform");
+		const printform = printformEl;
 		var pformat = document.createElement('div');
 		pformat.classList.add("printform_formatter");
 		printform.parentNode.insertBefore(pformat, printform);
@@ -552,12 +552,11 @@ function pause_in_milliseconds(time) {
 }
 
 async function run_function_sequentially() {
-	var printform = document.querySelectorAll(".printform");
-	var prinbform_no =  printform.length;
-	console.log(prinbform_no);
-	for(var i = 0; i < prinbform_no; i ++){
-		try{await pause_in_milliseconds(1);}catch(error){console.error("pause_in_milliseconds error");}
-		try{await printform_process();}     catch(error){console.error("printform_process error");}
+	const printforms = document.querySelectorAll(".printform");
+	console.log(printforms.length);
+	for (const pf of printforms) {
+		try { await pause_in_milliseconds(1); } catch(error) { console.error("pause_in_milliseconds error"); }
+		try { await printform_process(pf); } catch(error) { console.error("printform_process error", error); }
 	}
 }
 
