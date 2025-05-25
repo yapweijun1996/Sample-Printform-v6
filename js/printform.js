@@ -277,30 +277,30 @@ async function printform_process(formEl, config){
 	pformat = document.querySelector(".printform_formatter");
 	
 	var pheader = printform.querySelector(".pheader");
-	var ph_height = (formatIntl(pheader.getBoundingClientRect().height));
+	var ph_height = pheader.offsetHeight;
 	console.log("ph_height : " + ph_height);
 	
 	var pdocinfo = printform.querySelector(".pdocinfo");
-	var pdi_height = (formatIntl(pdocinfo.getBoundingClientRect().height));
+	var pdi_height = pdocinfo.offsetHeight;
 	console.log("pdi_height : " + pdi_height);
 	
 	var prowheader = printform.querySelector(".prowheader");
-	var prh_height = (formatIntl(prowheader.getBoundingClientRect().height));
+	var prh_height = prowheader.offsetHeight;
 	console.log("prd_height : " + prh_height);
 	
 	var pfooter = printform.querySelector(".pfooter");
-	var pf_height = (formatIntl(pfooter.getBoundingClientRect().height));
+	var pf_height = pfooter.offsetHeight;
 	console.log("pf_height : " + pf_height);
 	
 	var pfooter_logo = printform.querySelector(".pfooter_logo");
-	var pfl_height = (formatIntl(pfooter_logo.getBoundingClientRect().height));
+	var pfl_height = pfooter_logo.offsetHeight;
 	console.log("pfl_height : " + pfl_height);
 	
 	var prowitem = printform.querySelectorAll(".prowitem");
 	var pr_height = 0;
 	var temp;
 	for( var i = 0; i < prowitem.length ; i ++){
-		temp = (formatIntl(prowitem[i].getBoundingClientRect().height));
+		temp = prowitem[i].offsetHeight;
 		if(temp != 0){
 			pr_height += temp;
 		}
@@ -365,7 +365,7 @@ async function printform_process(formEl, config){
 	
 	// Loop all row item [start]
 	for( var i = 0; i < prowitem.length ; i ++){
-		temp = (formatIntl(prowitem[i].getBoundingClientRect().height));
+		temp = prowitem[i].offsetHeight;
 		
 		if(current_page_height == 0){
 			addHeader(pheader, pformat);
