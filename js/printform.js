@@ -203,14 +203,15 @@ function addProcessedInClassName(input_ele, input_classname){
 }
 
 
-function printform_process(printformEl){
+function printform_process(){
 	
 	return new Promise(resolve => {
 		
-		const printform = printformEl;
+		var printform = document.querySelector(".printform");
 		var pformat = document.createElement('div');
 		pformat.classList.add("printform_formatter");
 		printform.parentNode.insertBefore(pformat, printform);
+		pformat = document.querySelector(".printform_formatter");
 		
 		var pheader = printform.querySelector(".pheader");
 		var ph_height = parseFloat(pheader.getBoundingClientRect().height.toFixed(2));
@@ -551,17 +552,20 @@ function pause_in_milliseconds(time) {
 }
 
 async function run_function_sequentially() {
-	const printforms = document.querySelectorAll(".printform");
-	console.log(printforms.length);
-	for (const pf of printforms) {
-		try { await pause_in_milliseconds(1); } catch(error) { console.error("pause_in_milliseconds error"); }
-		try { await printform_process(pf); } catch(error) { console.error("printform_process error", error); }
+	var printform = document.querySelectorAll(".printform");
+	var prinbform_no =  printform.length;
+	console.log(prinbform_no);
+	for(var i = 0; i < prinbform_no; i ++){
+		try{await pause_in_milliseconds(1);}catch(error){console.error("pause_in_milliseconds error");}
+		try{await printform_process();}     catch(error){console.error("printform_process error");}
 	}
 }
 
 if(!run_function_sequentially_processed){ var run_function_sequentially_processed = false; }
 
-if(run_function_sequentially_processed == false){
-	run_function_sequentially();
-	run_function_sequentially_processed = true;
-}
+window.onload = function() {
+    if(run_function_sequentially_processed == false){
+		run_function_sequentially();
+		run_function_sequentially_processed = true;
+	}
+};
