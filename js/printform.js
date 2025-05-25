@@ -1,20 +1,31 @@
-/****** Setting [start] ******/
-var repeat_header = (typeof repeat_header !== 'undefined') ? repeat_header : "y";
-var repeat_docinfo = (typeof repeat_docinfo !== 'undefined') ? repeat_docinfo : "y";
-var repeat_rowheader = (typeof repeat_rowheader !== 'undefined') ? repeat_rowheader : "y";
-var repeat_footer = (typeof repeat_footer !== 'undefined') ? repeat_footer : "n";
-var repeat_footer_logo = (typeof repeat_footer_logo !== 'undefined') ? repeat_footer_logo : "n";
-var insert_dummy_row_item_while_format_table = (typeof insert_dummy_row_item_while_format_table !== 'undefined') ? insert_dummy_row_item_while_format_table : "y";
-var insert_dummy_row_while_format_table = (typeof insert_dummy_row_while_format_table !== 'undefined') ? insert_dummy_row_while_format_table : "n";
-var insert_footer_spacer_while_format_table = (typeof insert_footer_spacer_while_format_table !== 'undefined') ? insert_footer_spacer_while_format_table : "y";
-var insert_footer_spacer_with_dummy_row_item_while_format_table = (typeof insert_footer_spacer_with_dummy_row_item_while_format_table !== 'undefined') ? insert_footer_spacer_with_dummy_row_item_while_format_table : "y";
-var custom_dummy_row_item_content = (typeof custom_dummy_row_item_content !== 'undefined') ? custom_dummy_row_item_content : "";
+/**
+ * Retrieves a configuration value from a DOM element's data attribute, with a default fallback.
+ * @param {HTMLElement} element - The DOM element.
+ * @param {string} keyCamelCase - The camelCase version of the data attribute key (e.g., 'papersizeWidth' for 'data-papersize-width').
+ * @param {*} defaultValue - The default value to return if the attribute is not found or is empty.
+ * @param {string} type - The expected type: 'string', 'number', 'booleanYN' (for 'y'/'n' strings).
+ * @returns {*} The configuration value.
+ * @example
+ * const width = getConfigValue(myDiv, 'papersizeWidth', 750, 'number');
+ * const shouldRepeat = getConfigValue(myDiv, 'repeatHeader', 'y', 'booleanYN');
+ */
+function getConfigValue(element, keyCamelCase, defaultValue, type = 'string') {
+	const value = element.dataset[keyCamelCase];
+	if (typeof value === 'undefined' || value === null || value === '') {
+		return defaultValue;
+	}
 
-// Assuming vle_temp_paper_width and vle_temp_paper_height are defined somewhere
-var papersize_width = (typeof papersize_width !== 'undefined') ? papersize_width : 750; // Default to 750px
-var papersize_height = (typeof papersize_height !== 'undefined') ? papersize_height : 1050; // Default to a standard A4 height (1050px)
-var height_of_dummy_row_item = (typeof height_of_dummy_row_item !== 'undefined') ? height_of_dummy_row_item : 18; // Default height
-/****** Setting [end  ] ******/
+	switch (type) {
+		case 'number':
+			const num = parseFloat(value);
+			return isNaN(num) ? defaultValue : num;
+		case 'booleanYN':
+			return value.toLowerCase() === 'y' ? 'y' : 'n'; // Keeps 'y'/'n' convention
+		case 'string':
+		default:
+			return value;
+	}
+}
 
 /**
  * Adds a dummy row (table) to a target DOM element.
@@ -342,37 +353,68 @@ function addProcessedSuffixToClassName(inputElement, inputClassName){
 	inputElement.classList.add(tempClassNameNew);
 }
 
-function printform_process(){
+/**
+ * Main processing function for a single print form.
+ * @param {HTMLElement} printformElement - The specific .printform DOM element to process.
+ * @async
+ */
+async function printform_process(printformElement){
 	
+	// Read configuration from data-* attributes of printformElement
+	const config = {
+		repeatHeader: getConfigValue(printformElement, 'repeatHeader', "y", 'booleanYN'),
+		repeatDocinfo: getConfigValue(printformElement, 'repeatDocinfo', "y", 'booleanYN'),
+		repeatRowheader: getConfigValue(printformElement, 'repeatRowheader', "y", 'booleanYN'),
+		repeatFooter: getConfigValue(printformElement, 'repeatFooter', "n", 'booleanYN'),
+		repeatFooterLogo: getConfigValue(printformElement, 'repeatFooterLogo', "n", 'booleanYN'),
+		insertDummyRowItemWhileFormatTable: getConfigValue(printformElement, 'insertDummyRowItemWhileFormatTable', "y", 'booleanYN'),
+		insertDummyRowWhileFormatTable: getConfigValue(printformElement, 'insertDummyRowWhileFormatTable', "n", 'booleanYN'),
+		insertFooterSpacerWithDummyRowItemWhileFormatTable: getConfigValue(printformElement, 'insertFooterSpacerWithDummyRowItemWhileFormatTable', "y", 'booleanYN'),
+		customDummyRowItemContent: getConfigValue(printformElement, 'customDummyRowItemContent', "", 'string'),
+		papersizeWidth: getConfigValue(printformElement, 'papersizeWidth', 750, 'number'),
+		papersizeHeight: getConfigValue(printformElement, 'papersizeHeight', 1050, 'number'),
+		heightOfDummyRowItem: getConfigValue(printformElement, 'heightOfDummyRowItem', 18, 'number')
+	};
+
+	// Mutable state for the current print form processing cycle
+	let layoutState = {
+		insertFooterSpacerWhileFormatTable: getConfigValue(printformElement, 'insertFooterSpacerWhileFormatTable', "y", 'booleanYN')
+	};
+
 	return new Promise(resolve => {
 		
-		const printform = document.querySelector(".printform");
+		// const printform = document.querySelector(".printform"); // This will now be printformElement
 		let pformat = document.createElement('div');
 		pformat.classList.add("printform_formatter");
-		printform.parentNode.insertBefore(pformat, printform);
-		pformat = document.querySelector(".printform_formatter");
+		printformElement.parentNode.insertBefore(pformat, printformElement);
+		pformat = document.querySelector(".printform_formatter"); // This might need to be scoped if multiple run async
+		// For now, assuming processAllPrintforms runs them sequentially enough.
+		// A safer way: pformat should be directly used, not re-queried globally.
+		// Let's correct this:
+		// Corrected pformat handling:
+		const parentOfPrintform = printformElement.parentNode;
+		const newPformat = document.createElement('div');
+		newPformat.classList.add("printform_formatter");
+		parentOfPrintform.insertBefore(newPformat, printformElement);
+		// pformat is now newPformat
+
+		const pheader = printformElement.querySelector(".pheader");
+		// Ensure pheader exists before getting its height
+		const ph_height = pheader ? parseFloat(pheader.getBoundingClientRect().height.toFixed(2)) : 0;
 		
-		const pheader = printform.querySelector(".pheader");
-		const ph_height = parseFloat(pheader.getBoundingClientRect().height.toFixed(2));
-		// console.log("ph_height : " + ph_height);
+		const pdocinfo = printformElement.querySelector(".pdocinfo");
+		const pdi_height = pdocinfo ? parseFloat(pdocinfo.getBoundingClientRect().height.toFixed(2)) : 0;
 		
-		const pdocinfo = printform.querySelector(".pdocinfo");
-		const pdi_height = parseFloat(pdocinfo.getBoundingClientRect().height.toFixed(2));
-		// console.log("pdi_height : " + pdi_height);
+		const prowheader = printformElement.querySelector(".prowheader");
+		const prh_height = prowheader ? parseFloat(prowheader.getBoundingClientRect().height.toFixed(2)) : 0;
 		
-		const prowheader = printform.querySelector(".prowheader");
-		const prh_height = parseFloat(prowheader.getBoundingClientRect().height.toFixed(2));
-		// console.log("prd_height : " + prh_height);
+		const pfooter = printformElement.querySelector(".pfooter");
+		const pf_height = pfooter ? parseFloat(pfooter.getBoundingClientRect().height.toFixed(2)) : 0;
 		
-		const pfooter = printform.querySelector(".pfooter");
-		const pf_height = parseFloat(pfooter.getBoundingClientRect().height.toFixed(2));
-		// console.log("pf_height : " + pf_height);
+		const pfooter_logo = printformElement.querySelector(".pfooter_logo");
+		const pfl_height = pfooter_logo ? parseFloat(pfooter_logo.getBoundingClientRect().height.toFixed(2)) : 0;
 		
-		const pfooter_logo = printform.querySelector(".pfooter_logo");
-		const pfl_height = parseFloat(pfooter_logo.getBoundingClientRect().height.toFixed(2));
-		// console.log("pfl_height : " + pfl_height);
-		
-		const prowitem = printform.querySelectorAll(".prowitem");
+		const prowitem = printformElement.querySelectorAll(".prowitem");
 		let pr_height = 0;
 		let temp_item_height;
 		for( let i = 0; i < prowitem.length ; i++){
@@ -399,24 +441,24 @@ function printform_process(){
 		let height_per_page = 0;
 		let tb_page_break_before_yn = "n";
 		
-		height_per_page = papersize_height;
-		if(repeat_header === "y"){
+		height_per_page = config.papersizeHeight;
+		if(config.repeatHeader === "y"){
 			// console.log("ph_height : " + ph_height);
 			height_per_page -= ph_height;
 		}
-		if(repeat_docinfo === "y"){
+		if(config.repeatDocinfo === "y"){
 			// console.log("pdi_height : " + pdi_height);
 			height_per_page -= pdi_height;
 		}
-		if(repeat_rowheader === "y"){
+		if(config.repeatRowheader === "y"){
 			// console.log("prh_height : " + prh_height);
 			height_per_page -= prh_height;
 		}
-		if(repeat_footer === "y"){
+		if(config.repeatFooter === "y"){
 			// console.log("pf_height : " + pf_height);
 			height_per_page -= pf_height;
 		}
-		if(repeat_footer_logo === "y"){
+		if(config.repeatFooterLogo === "y"){
 			// console.log("pfl_height : " + pfl_height);
 			height_per_page -= pfl_height;
 		}
@@ -434,7 +476,7 @@ function printform_process(){
 			
 			if(current_page_height === 0){
 				addHeaderElement(pheader, pformat);
-				if(repeat_header === "y"){
+				if(config.repeatHeader === "y"){
 					
 				}else{
 					current_page_height += ph_height;
@@ -442,14 +484,14 @@ function printform_process(){
 				
 				addDocInfoElement(pdocinfo, pformat);
 				
-				if(repeat_docinfo === "y"){
+				if(config.repeatDocinfo === "y"){
 					
 				}else{
 					current_page_height += pdi_height;
 				}
 				
 				addRowHeaderElement(prowheader, pformat);
-				if(repeat_rowheader === "y"){
+				if(config.repeatRowheader === "y"){
 					
 				}else{
 					current_page_height += prh_height;
@@ -467,42 +509,42 @@ function printform_process(){
 				
 				current_page_height -= temp_item_height;
 				
-				current_page_height = processInsertDummyRowItemsToFillPage(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
+				current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
 
-				current_page_height = processInsertSingleDummyRowToFillPage(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
+				current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
 				
-				let previous_insert_footer_spacer_while_format_table = insert_footer_spacer_while_format_table;
-				current_page_height = processInsertFooterSpacerWithDummyRowItems(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+				let previous_insert_footer_spacer_while_format_table = layoutState.insertFooterSpacerWhileFormatTable;
+				current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 				let useProcessInsertFooterSpacer = true;
-				if (insert_footer_spacer_with_dummy_row_item_while_format_table === "y" && previous_insert_footer_spacer_while_format_table === "y") {
-					if (insert_footer_spacer_with_dummy_row_item_while_format_table === "y") {
+				if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y" && previous_insert_footer_spacer_while_format_table === "y") {
+					if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y") {
 						 useProcessInsertFooterSpacer = false;
 					}
 				}
 
 				if(useProcessInsertFooterSpacer){
-					processInsertFooterSpacer(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+					processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 				}
 				
-				if(repeat_footer === "y"){
+				if(config.repeatFooter === "y"){
 					addFooterElement(pfooter, pformat);
 				}
 				
-				if(repeat_footer_logo === "y"){
+				if(config.repeatFooterLogo === "y"){
 					addFooterLogoElement(pfooter_logo, pformat);
 				}
 				
 				addPageBreakElement(div_page_break_before, pformat);
 				
-				if(repeat_header === "y"){
+				if(config.repeatHeader === "y"){
 					addHeaderElement(pheader, pformat);
 				}
 				
-				if(repeat_docinfo === "y"){
+				if(config.repeatDocinfo === "y"){
 					addDocInfoElement(pdocinfo, pformat);
 				}
 				
-				if(repeat_rowheader === "y"){
+				if(config.repeatRowheader === "y"){
 					addRowHeaderElement(prowheader, pformat);
 				}
 				
@@ -516,33 +558,33 @@ function printform_process(){
 				}else{
 					current_page_height -= temp_item_height;
 					
-					current_page_height = processInsertDummyRowItemsToFillPage(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
+					current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
 					
-					current_page_height = processInsertSingleDummyRowToFillPage(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
+					current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
 					
-					current_page_height = processInsertFooterSpacerWithDummyRowItems(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+					current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 					
-					processInsertFooterSpacer(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+					processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 					
-					if(repeat_footer === "y"){
+					if(config.repeatFooter === "y"){
 						addFooterElement(pfooter, pformat);
 					}
 					
-					if(repeat_footer_logo === "y"){
+					if(config.repeatFooterLogo === "y"){
 						addFooterLogoElement(pfooter_logo, pformat);
 					}
 					
 					addPageBreakElement(div_page_break_before, pformat);
 					
-					if(repeat_header === "y"){
+					if(config.repeatHeader === "y"){
 						addHeaderElement(pheader, pformat);
 					}
 					
-					if(repeat_docinfo === "y"){
+					if(config.repeatDocinfo === "y"){
 						addDocInfoElement(pdocinfo, pformat);
 					}
 					
-					if(repeat_rowheader === "y"){
+					if(config.repeatRowheader === "y"){
 						addRowHeaderElement(prowheader, pformat);
 					}
 					
@@ -557,48 +599,48 @@ function printform_process(){
 		
 		// Last Footer [start]
 		let spaceNeededForLastFooter = 0;
-		if (repeat_footer !== "y") spaceNeededForLastFooter += pf_height;
-		if (repeat_footer_logo !== "y") spaceNeededForLastFooter += pfl_height;
+		if (config.repeatFooter !== "y") spaceNeededForLastFooter += pf_height;
+		if (config.repeatFooterLogo !== "y") spaceNeededForLastFooter += pfl_height;
 		
 		if((current_page_height + spaceNeededForLastFooter) <= height_per_page){
-			current_page_height = processInsertDummyRowItemsToFillPage(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
+			current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
 			
-			current_page_height = processInsertSingleDummyRowToFillPage(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
+			current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
 			
-			let previous_insert_footer_spacer_while_format_table_last = insert_footer_spacer_while_format_table;
-			current_page_height = processInsertFooterSpacerWithDummyRowItems(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+			let previous_insert_footer_spacer_while_format_table_last = layoutState.insertFooterSpacerWhileFormatTable;
+			current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 			let useProcessInsertFooterSpacerLast = true;
-			if (insert_footer_spacer_with_dummy_row_item_while_format_table === "y" && previous_insert_footer_spacer_while_format_table_last === "y") {
-				 if (insert_footer_spacer_with_dummy_row_item_while_format_table === "y") {
+			if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y" && previous_insert_footer_spacer_while_format_table_last === "y") {
+				 if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y") {
 					useProcessInsertFooterSpacerLast = false;
 				 }
 			}
 			if(useProcessInsertFooterSpacerLast){
-				processInsertFooterSpacer(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+				processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 			}
 			
 			addFooterElement(pfooter, pformat);
 			addFooterLogoElement(pfooter_logo, pformat);
 		}else{
-			current_page_height = processInsertDummyRowItemsToFillPage(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
-			current_page_height = processInsertSingleDummyRowToFillPage(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
+			current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
+			current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
 			
-			let previous_insert_footer_spacer_while_format_table_split = insert_footer_spacer_while_format_table;
-			current_page_height = processInsertFooterSpacerWithDummyRowItems(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+			let previous_insert_footer_spacer_while_format_table_split = layoutState.insertFooterSpacerWhileFormatTable;
+			current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 			let useProcessInsertFooterSpacerSplit = true;
-			 if (insert_footer_spacer_with_dummy_row_item_while_format_table === "y" && previous_insert_footer_spacer_while_format_table_split === "y") {
-				 if (insert_footer_spacer_with_dummy_row_item_while_format_table === "y") {
+			 if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y" && previous_insert_footer_spacer_while_format_table_split === "y") {
+				 if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y") {
 					useProcessInsertFooterSpacerSplit = false;
 				 }
 			}
 			if(useProcessInsertFooterSpacerSplit){
-				processInsertFooterSpacer(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+				processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 			}
 
-			if(repeat_footer === "y"){
+			if(config.repeatFooter === "y"){
 				addFooterElement(pfooter, pformat);
 			}
-			if(repeat_footer_logo === "y"){
+			if(config.repeatFooterLogo === "y"){
 				addFooterLogoElement(pfooter_logo, pformat);
 			}
 					
@@ -607,47 +649,47 @@ function printform_process(){
 			current_page_height = 0;
 			
 			
-			if(repeat_header === "y"){
+			if(config.repeatHeader === "y"){
 				addHeaderElement(pheader, pformat);
 			}else{
 				
 			}
 			
-			if(repeat_docinfo === "y"){
+			if(config.repeatDocinfo === "y"){
 				addDocInfoElement(pdocinfo, pformat);
 			}else{
 				
 			}
 			
-			if(repeat_rowheader === "y"){
+			if(config.repeatRowheader === "y"){
 				addRowHeaderElement(prowheader, pformat);
 			}else{
 				
 			}
 			
-			if(repeat_footer === "y"){
+			if(config.repeatFooter === "y"){
 				current_page_height -= pf_height;
 			}
-			if(repeat_footer_logo === "y"){
+			if(config.repeatFooterLogo === "y"){
 				current_page_height -= pfl_height;
 			}
 			
 			current_page_height += pf_height;
 			current_page_height += pfl_height;
 			
-			current_page_height = processInsertDummyRowItemsToFillPage(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
-			current_page_height = processInsertSingleDummyRowToFillPage(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
+			current_page_height = processInsertDummyRowItemsToFillPage(config.insertDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem);
+			current_page_height = processInsertSingleDummyRowToFillPage(config.insertDummyRowWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat, config.heightOfDummyRowItem, config.papersizeWidth);
 			
-			let previous_insert_footer_spacer_while_format_table_final = insert_footer_spacer_while_format_table;
-			current_page_height = processInsertFooterSpacerWithDummyRowItems(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+			let previous_insert_footer_spacer_while_format_table_final = layoutState.insertFooterSpacerWhileFormatTable;
+			current_page_height = processInsertFooterSpacerWithDummyRowItems(config.insertFooterSpacerWithDummyRowItemWhileFormatTable, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 			let useProcessInsertFooterSpacerFinal = true;
-			if (insert_footer_spacer_with_dummy_row_item_while_format_table === "y" && previous_insert_footer_spacer_while_format_table_final === "y") {
-				if (insert_footer_spacer_with_dummy_row_item_while_format_table === "y") {
+			if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y" && previous_insert_footer_spacer_while_format_table_final === "y") {
+				if (config.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y") {
 					useProcessInsertFooterSpacerFinal = false;
 				}
 			}
 			if(useProcessInsertFooterSpacerFinal){
-				processInsertFooterSpacer(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
+				processInsertFooterSpacer(layoutState.insertFooterSpacerWhileFormatTable, pfooter_spacer, height_per_page, current_page_height, config.repeatFooterLogo, pfl_height, pformat);
 			}
 			
 			addFooterElement(pfooter, pformat);
@@ -656,9 +698,10 @@ function printform_process(){
 		// Last Footer [end  ]
 		
 		
-		addProcessedSuffixToClassName(pformat, "printform_formatter");
+		addProcessedSuffixToClassName(newPformat, "printform_formatter");
 		
-		printform.remove();
+		printformElement.style.display = 'none'; // Hide original, don't remove yet if pformat is based on global query
+		// printformElement.remove(); // Original logic
 		// console.log("printform : remove");
 		resolve();
 	});
@@ -699,29 +742,34 @@ function pause(timeInMilliseconds) {
  * @example
  * await processAllPrintforms();
  */
-async function processAllPrintforms() {
-	const printforms = document.querySelectorAll(".printform");
-	const numberOfPrintforms =  printforms.length;
+async function processAllPrintforms() { 
+	const printformElements = document.querySelectorAll(".printform"); // Renamed for clarity
+	const numberOfPrintforms =  printformElements.length;
 	// console.log(numberOfPrintforms);
 	for(let i = 0; i < numberOfPrintforms; i++){
+		const currentPrintformElement = printformElements[i];
 		try{
-			await pause(1);
+			await pause(1); 
 		} catch(error){
-			console.error("pause error:", error);
+			console.error("pause error:", error); 
 		}
 		try{
-			await printform_process();
+			await printform_process(currentPrintformElement); // Pass the element
 		} catch(error){
-			console.error("printform_process error:", error);
+			console.error("printform_process error for element:", currentPrintformElement, "error:", error); 
 		}
 	}
 }
 
-let runFunctionSequentiallyProcessed = false;
+// let runFunctionSequentiallyProcessed = false; // This flag might need to be managed differently if multiple sets of forms can appear. For now, assume one-time onload.
+// Make it a const if it's truly a one-time check. If re-processing can happen, this needs thought.
+// For now, keeping it simple:
+let hasProcessedOnLoad = false; 
+
 
 window.onload = function() {
-    if(runFunctionSequentiallyProcessed === false){
-		processAllPrintforms();
-		runFunctionSequentiallyProcessed = true;
+    if(hasProcessedOnLoad === false){ 
+		processAllPrintforms(); 
+		hasProcessedOnLoad = true;
 	}
 };
