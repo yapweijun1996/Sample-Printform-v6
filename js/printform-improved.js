@@ -493,7 +493,7 @@ function delay(milliseconds) {
  * @param {Object} config - Configuration options
  * @returns {Promise} Promise that resolves when all forms are processed
  */
-async function processAllPrintForms(config = {}) {
+window.processAllPrintForms = async function processAllPrintForms(config = {}) {
     const printForms = document.querySelectorAll('.printform');
     
     if (printForms.length === 0) {
@@ -527,7 +527,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Small delay to allow custom configurations to run first
     setTimeout(() => {
         if (!window.isProcessingComplete) {
-            processAllPrintForms()
+            window.processAllPrintForms()
                 .then(() => {
                     window.isProcessingComplete = true;
                     console.log('Print form processing completed successfully');
@@ -550,7 +550,7 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         PrintFormProcessor: window.PrintFormProcessor,
         PrintFormConfig: window.PrintFormConfig,
-        processAllPrintForms,
+        processAllPrintForms: window.processAllPrintForms,
         delay
     };
 } 

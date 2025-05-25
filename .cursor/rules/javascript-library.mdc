@@ -1,0 +1,54 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project: JavaScript Library
+# Purpose: Ensure consistent, high-quality, idiomatic JavaScript code suitable for open-source use.
+
+## General Principles
+- Use modern JavaScript (ES6+) syntax. Prefer `const` and `let` over `var`.
+- Follow functional programming practices where practical (pure functions, avoid side effects).
+- Write reusable, composable functions/modules.
+- All public APIs should be well documented using JSDoc comments.
+
+## Code Style
+- Use camelCase for variable and function names.
+- Use PascalCase for class names.
+- Use 2 spaces for indentation.
+- Prefer arrow functions for short callbacks or inline functions.
+- Always use strict equality (`===`, `!==`) over abstract equality.
+- Avoid deeply nested code; refactor into smaller functions if necessary.
+
+## Module System
+- Export library code using ES Modules (`export`/`import`), unless otherwise specified.
+- Ensure the main entry file provides a default export for the primary API.
+
+## Documentation & Examples
+- Every exported function/class should have a JSDoc comment describing parameters and return types.
+- Add at least one usage example in the JSDoc for each exported function.
+- Provide a README.md example after adding/changing major API.
+
+## Testing
+- Write unit tests for all public functions.
+- Use [Jest](https://jestjs.io/) as the preferred test runner (unless specified otherwise).
+- All new code should have corresponding test cases.
+
+## Error Handling & Validation
+- Validate all function arguments and provide helpful error messages.
+- Never throw raw errors—create descriptive, custom error messages.
+
+## Performance & Security
+- Avoid unnecessary computation in frequently called functions.
+- Never use `eval` or the Function constructor.
+- Avoid introducing dependencies unless absolutely necessary.
+
+## Other Conventions
+- Use semicolons at the end of every statement.
+- Avoid commented-out code blocks; remove dead code promptly.
+- Add a changelog entry for every user-facing change.
+
+# Do NOT
+- Do not introduce breaking changes without updating the major version.
+- Do not use non-standard or deprecated JavaScript features.
+- Do not commit sensitive data or credentials.

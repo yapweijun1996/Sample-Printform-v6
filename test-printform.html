@@ -35,7 +35,7 @@
                     results.innerHTML += '<div class="test-result error">❌ PrintFormProcessor class is not defined</div>';
                 }
                 
-                if (typeof processAllPrintForms !== 'undefined') {
+                if (typeof window.processAllPrintForms !== 'undefined') {
                     results.innerHTML += '<div class="test-result success">✅ processAllPrintForms function is available</div>';
                 } else {
                     results.innerHTML += '<div class="test-result error">❌ processAllPrintForms function is not available</div>';
