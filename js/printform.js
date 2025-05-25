@@ -17,7 +17,7 @@ var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
 /****** Setting [end  ] ******/
 
 function formatIntl(num) {
-	return parseFloat(Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }).format(num));
+	return parseFloat(Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0, useGrouping: false }).format(num));
 }
 
 // [INJECT] Read per-form config from data-* attributes
