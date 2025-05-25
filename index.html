@@ -11,7 +11,7 @@
 				padding: 0px;
 			}
 			.paper_width{
-				width:750px;
+				width:396px;
 			}
 			td{
 				line-height:18px;
@@ -19,65 +19,46 @@
 		</style>
 		
 		<script>
-			// Configuration for the improved PrintForm system
-			// Override the auto-initialization to use custom settings
-			window.addEventListener('DOMContentLoaded', () => {
-				if (!window.isProcessingComplete) {
-					// Use your existing configuration with the improved system
-					window.processAllPrintForms({
-						paperWidth: 750,        // Your current paper width
-						paperHeight: 1050,       // Your current paper height
-						dummyRowHeight: 27,     // Your current dummy row height
-						
-						// Convert your "y"/"n" strings to booleans
-						repeatHeader: true,     // repeat_header = "y"
-						repeatDocInfo: true,    // repeat_docinfo = "y"
-						repeatRowHeader: true,  // repeat_rowheader = "y"
-						repeatFooter: true,     // repeat_footer = "y"
-						repeatFooterLogo: true, // repeat_footer_logo = "y"
-						
-						// Spacing options
-						insertDummyRowItem: true,              // insert_dummy_row_item_while_format_table = "y"
-						insertDummyRow: true,                  // insert_dummy_row_while_format_table = "y"
-						insertFooterSpacer: true,              // insert_footer_spacer_while_format_table = "y"
-						insertFooterSpacerWithDummyRow: true,  // insert_footer_spacer_with_dummy_row_item_while_format_table = "y"
-						
-						// Your custom dummy row content
-						customDummyRowContent: `
+			var papersize_width = 396; // 795px is A4 width, 6.35mm is 24px
+			var papersize_height = 550;
+			var height_of_dummy_row_item = 27;
+			
+			var repeat_header                                                = "y";
+			var repeat_docinfo                                               = "y";
+			var repeat_rowheader                                             = "y";
+			var repeat_footer                                                = "y";
+			var repeat_footer_logo                                           = "y";
+			var insert_dummy_row_item_while_format_table                     = "y";
+			var insert_dummy_row_while_format_table                          = "y";
+			var insert_footer_spacer_while_format_table                      = "y";
+			var insert_footer_spacer_with_dummy_row_item_while_format_table  = "y";
+			var custom_dummy_row_item_content                                = `
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
 							<tr>
-								<td style="box-sizing:border-box;width:15px;"></td>
 								<td style="box-sizing:border-box;width:inherit;"></td>
-								<td style="box-sizing:border-box;width:15px;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
 							</tr>
 							<tr>
-								<td style="box-sizing:border-box;"></td>
-								<td style="box-sizing:border-box;">
-									<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
-										<tr>
-											<td style="box-sizing:border-box;width:inherit;"></td>
-											<td style="box-sizing:border-box;width:50px;"></td>
-											<td style="box-sizing:border-box;width:42px;"></td>
-											<td style="box-sizing:border-box;width:78px;"></td>
-										</tr>
-										<tr>
-											<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">&nbsp;</div></td>
-											<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;"></div></td>
-											<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;"></div></td>
-											<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;"></div></td>
-										</tr>
-									</table>
-								</td>
-								<td style="box-sizing:border-box;"></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">&nbsp;</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;"></div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;"></div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;"></div></td>
 							</tr>
-						`
-					}).then(() => {
-						window.isProcessingComplete = true;
-						console.log('Custom PrintForm processing completed successfully');
-					}).catch(error => {
-						console.error('Custom PrintForm processing failed:', error);
-					});
-				}
-			});
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			`;
 		</script>
 	</head>
 	<body>
@@ -543,7 +524,7 @@
 				</tr>
 			</table>
 		</div>
-		<script src="./js/printform-improved.js"></script>
+		<script src="./js/printform.js"></script>
 		
 		<!-- extra tools [start] -->
 		<style>
