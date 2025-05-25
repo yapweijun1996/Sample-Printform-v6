@@ -1,24 +1,24 @@
 /****** Setting [start] ******/
-var repeat_header = repeat_header || "y";
-var repeat_docinfo = repeat_docinfo || "y";
-var repeat_rowheader = repeat_rowheader || "y";
-var repeat_footer = repeat_footer || "n";
-var repeat_footer_logo = repeat_footer_logo || "n";
-var insert_dummy_row_item_while_format_table = insert_dummy_row_item_while_format_table || "y";
-var insert_dummy_row_while_format_table = insert_dummy_row_while_format_table || "n";
-var insert_footer_spacer_while_format_table = insert_footer_spacer_while_format_table || "y";
-var insert_footer_spacer_with_dummy_row_item_while_format_table = insert_footer_spacer_with_dummy_row_item_while_format_table || "y";
-var custom_dummy_row_item_content = custom_dummy_row_item_content || "";
+let repeat_header = repeat_header || "y";
+let repeat_docinfo = repeat_docinfo || "y";
+let repeat_rowheader = repeat_rowheader || "y";
+let repeat_footer = repeat_footer || "n";
+let repeat_footer_logo = repeat_footer_logo || "n";
+let insert_dummy_row_item_while_format_table = insert_dummy_row_item_while_format_table || "y";
+let insert_dummy_row_while_format_table = insert_dummy_row_while_format_table || "n";
+let insert_footer_spacer_while_format_table = insert_footer_spacer_while_format_table || "y";
+let insert_footer_spacer_with_dummy_row_item_while_format_table = insert_footer_spacer_with_dummy_row_item_while_format_table || "y";
+let custom_dummy_row_item_content = custom_dummy_row_item_content || "";
 
 // Assuming vle_temp_paper_width and vle_temp_paper_height are defined somewhere
-var papersize_width = papersize_width || 750; // Default to 795px (A4 width)
-var papersize_height = papersize_height || 1050; // Default to a standard A4 height (1122px)
-var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
+let papersize_width = papersize_width || 750; // Default to 795px (A4 width)
+let papersize_height = papersize_height || 1050; // Default to a standard A4 height (1122px)
+let height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
 /****** Setting [end  ] ******/
 
 // Insert createSpacer helper to DRY dummy-row logic
 function createSpacer({ targetElement, height, className, width, content }) {
-	var spacer = document.createElement('table');
+	const spacer = document.createElement('table');
 	spacer.className = className;
 	spacer.setAttribute('width', width + 'px');
 	spacer.setAttribute('cellspacing', '0');
@@ -546,7 +546,7 @@ async function run_function_sequentially() {
 	}
 }
 
-if(!run_function_sequentially_processed){ var run_function_sequentially_processed = false; }
+let run_function_sequentially_processed = false;
 
 // ES module: expose init and render functions
 export function initPrintFormOptions(opts = {}) {
