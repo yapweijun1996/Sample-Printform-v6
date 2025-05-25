@@ -489,13 +489,18 @@ function delay(milliseconds) {
  */
 async function processAllPrintForms(config = {}) {
     const printForms = document.querySelectorAll('.printform');
-    const processor = new PrintFormProcessor(config);
+    
+    if (printForms.length === 0) {
+        console.log('No print forms found to process');
+        return;
+    }
     
     console.log(`Found ${printForms.length} print form(s) to process`);
     
     for (let i = 0; i < printForms.length; i++) {
         try {
             await delay(1); // Small delay between processing
+            const processor = new PrintFormProcessor(config);
             await processor.process();
             console.log(`Processed print form ${i + 1}/${printForms.length}`);
         } catch (error) {
@@ -507,20 +512,25 @@ async function processAllPrintForms(config = {}) {
 }
 
 // Global state management
-let isProcessingComplete = false;
+if (typeof window.isProcessingComplete === 'undefined') {
+    window.isProcessingComplete = false;
+}
 
-// Auto-initialize when DOM is loaded
+// Auto-initialize when DOM is loaded (only if not already configured)
 window.addEventListener('DOMContentLoaded', () => {
-    if (!isProcessingComplete) {
-        processAllPrintForms()
-            .then(() => {
-                isProcessingComplete = true;
-                console.log('Print form processing completed successfully');
-            })
-            .catch(error => {
-                console.error('Print form processing failed:', error);
-            });
-    }
+    // Small delay to allow custom configurations to run first
+    setTimeout(() => {
+        if (!window.isProcessingComplete) {
+            processAllPrintForms()
+                .then(() => {
+                    window.isProcessingComplete = true;
+                    console.log('Print form processing completed successfully');
+                })
+                .catch(error => {
+                    console.error('Print form processing failed:', error);
+                });
+        }
+    }, 10);
 });
 
 // Export for module usage
