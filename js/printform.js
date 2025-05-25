@@ -141,14 +141,14 @@ function process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(
 		if(remaining_height_per_page > 0){
 			insert_dummy_row_item(pformat, remaining_height_per_page, height_of_dummy_row_item);
 			console.log("pformat : insert_dummy_row_item : "+ remaining_height_per_page);
-			remainder_for_remaining_height_per_page = parseFloat(formatIntl((remaining_height_per_page % height_of_dummy_row_item)));
+			remainder_for_remaining_height_per_page = (formatIntl((remaining_height_per_page % height_of_dummy_row_item)));
 			current_page_height = height_per_page - remainder_for_remaining_height_per_page;
 		}
 		
 		insert_footer_spacer_while_format_table = "n";
 	}
 	/***** insert_footer_spacer_with_dummy_row_item_while_format_table [end  ] *****/
-	var temp_value = parseFloat(formatIntl((current_page_height)));
+	var temp_value = (formatIntl((current_page_height)));
 	return temp_value;
 }
 
@@ -160,14 +160,14 @@ function process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_it
 		if(remaining_height_per_page > 0){
 			insert_dummy_row_item(pformat, remaining_height_per_page, height_of_dummy_row_item);
 			console.log("pformat : insert_dummy_row_item : "+ remaining_height_per_page);
-			remainder_for_remaining_height_per_page = parseFloat(formatIntl((remaining_height_per_page % height_of_dummy_row_item)));
+			remainder_for_remaining_height_per_page = (formatIntl((remaining_height_per_page % height_of_dummy_row_item)));
 			current_page_height = height_per_page - remainder_for_remaining_height_per_page;
 			cl("current_page_height");
 			cl(current_page_height);
 		}
 	}
 	/***** insert_dummy_row_item_while_format_table [end  ] *****/
-	var temp_value = parseFloat(formatIntl((current_page_height)));
+	var temp_value = (formatIntl((current_page_height)));
 	return temp_value;
 }
 
@@ -184,7 +184,7 @@ function process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_f
 		}
 	}
 	/***** insert_dummy_row_while_format_table [end  ] *****/
-	var temp_value = parseFloat(formatIntl((current_page_height)));
+	var temp_value = (formatIntl((current_page_height)));
 	return temp_value;
 }
 
@@ -277,30 +277,30 @@ async function printform_process(formEl, config){
 	pformat = document.querySelector(".printform_formatter");
 	
 	var pheader = printform.querySelector(".pheader");
-	var ph_height = parseFloat(formatIntl(pheader.getBoundingClientRect().height));
+	var ph_height = (formatIntl(pheader.getBoundingClientRect().height));
 	console.log("ph_height : " + ph_height);
 	
 	var pdocinfo = printform.querySelector(".pdocinfo");
-	var pdi_height = parseFloat(formatIntl(pdocinfo.getBoundingClientRect().height));
+	var pdi_height = (formatIntl(pdocinfo.getBoundingClientRect().height));
 	console.log("pdi_height : " + pdi_height);
 	
 	var prowheader = printform.querySelector(".prowheader");
-	var prh_height = parseFloat(formatIntl(prowheader.getBoundingClientRect().height));
+	var prh_height = (formatIntl(prowheader.getBoundingClientRect().height));
 	console.log("prd_height : " + prh_height);
 	
 	var pfooter = printform.querySelector(".pfooter");
-	var pf_height = parseFloat(formatIntl(pfooter.getBoundingClientRect().height));
+	var pf_height = (formatIntl(pfooter.getBoundingClientRect().height));
 	console.log("pf_height : " + pf_height);
 	
 	var pfooter_logo = printform.querySelector(".pfooter_logo");
-	var pfl_height = parseFloat(formatIntl(pfooter_logo.getBoundingClientRect().height));
+	var pfl_height = (formatIntl(pfooter_logo.getBoundingClientRect().height));
 	console.log("pfl_height : " + pfl_height);
 	
 	var prowitem = printform.querySelectorAll(".prowitem");
 	var pr_height = 0;
 	var temp;
 	for( var i = 0; i < prowitem.length ; i ++){
-		temp = parseFloat(formatIntl(prowitem[i].getBoundingClientRect().height));
+		temp = (formatIntl(prowitem[i].getBoundingClientRect().height));
 		if(temp != 0){
 			pr_height += temp;
 		}
@@ -365,7 +365,7 @@ async function printform_process(formEl, config){
 	
 	// Loop all row item [start]
 	for( var i = 0; i < prowitem.length ; i ++){
-		temp = parseFloat(formatIntl(prowitem[i].getBoundingClientRect().height));
+		temp = (formatIntl(prowitem[i].getBoundingClientRect().height));
 		
 		if(current_page_height == 0){
 			addHeader(pheader, pformat);
