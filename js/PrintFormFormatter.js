@@ -185,8 +185,13 @@ export class PrintFormFormatter {
 
   insertPageBreak() {
     const br = document.createElement('div');
-    br.classList.add('div_page_break_before');
-    br.style.pageBreakBefore = 'always';
+    // force page break before and after for reliable pagination
+    br.style.display = 'block';
+    br.style.height = '0px';
+    br.style.pageBreakBefore = 'always';   // legacy
+    br.style.breakBefore = 'always';       // modern spec
+    br.style.pageBreakAfter = 'always';    // legacy
+    br.style.breakAfter = 'always';        // modern spec
     this.formatterContainer.appendChild(br);
     this.log('Page break inserted');
   }
