@@ -19,6 +19,9 @@ var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
 // [INJECT] Read per-form config from data-* attributes
 function getPrintformConfig(formEl) {
 	const ds = formEl.dataset;
+	// detect custom footer template
+	const footerTmpl = formEl.querySelector('template.custom-footer-page-content');
+	const customFooterPageContent = footerTmpl ? footerTmpl.innerHTML.trim() : null;
 	// if user provided a <template> override, use its content
 	const tmpl = formEl.querySelector('template.custom-dummy-row-item-content');
 	const customDummyRowItemContent = tmpl
@@ -45,7 +48,8 @@ function getPrintformConfig(formEl) {
 		insertFooterSpacerWithDummyRowItemWhileFormatTable: ds.insertFooterSpacerWithDummyRowItemWhileFormatTable
 			? ds.insertFooterSpacerWithDummyRowItemWhileFormatTable === "y"
 			: insert_footer_spacer_with_dummy_row_item_while_format_table === "y",
-		customDummyRowItemContent
+		customDummyRowItemContent,
+		customFooterPageContent
 	};
 }
 
@@ -250,7 +254,8 @@ async function printform_process(formEl, config){
 		insertDummyRowWhileFormatTable,
 		insertFooterSpacerWhileFormatTable,
 		insertFooterSpacerWithDummyRowItemWhileFormatTable,
-		customDummyRowItemContent
+		customDummyRowItemContent,
+		customFooterPageContent
 	} = config;
 	papersize_width = papersizeWidth;
 	papersize_height = papersizeHeight;
@@ -585,6 +590,18 @@ async function printform_process(formEl, config){
 	}
 	// Last Footer [end  ]
 	
+	// if a custom footer template was provided, inject its content
+	if (customFooterPageContent) {
+		const tmp = document.createElement('div');
+		tmp.innerHTML = customFooterPageContent;
+		const footerEl = tmp.firstElementChild;
+		// replace page-number/total-pages if present
+		const num = footerEl.querySelector('.page-number');
+		const tot = footerEl.querySelector('.total-pages');
+		if (num) num.textContent = '1';
+		if (tot) tot.textContent = '1';
+		pformat.appendChild(footerEl);
+	}
 	
 	addProcessedInClassName(pformat, "printform_formatter");
 	
