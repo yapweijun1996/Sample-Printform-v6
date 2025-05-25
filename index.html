@@ -3,80 +3,40 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Printform Demo - Professional Look</title>
+		<title>Sample Printform Classic Demo</title>
 		<style>
-			body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f8f9fa; }
-			.printform {
-				margin: 32px auto 48px auto;
-				border: 1.5px solid #bbb;
-				background: #fff;
-				box-shadow: 0 2px 8px #0001;
-				max-width: 600px;
-				padding: 32px 32px 24px 32px;
-				border-radius: 8px;
-				position: relative;
-			}
-			.printform .logo {
-				width: 120px;
-				margin-bottom: 12px;
-			}
-			.printform .company-info {
-				font-size: 15px;
-				color: #444;
-				margin-bottom: 16px;
-			}
-			.printform .pheader {
-				font-size: 22px;
-				font-weight: bold;
-				color: #2a2a2a;
-				margin-bottom: 8px;
-				border-bottom: 2px solid #eee;
-				padding-bottom: 6px;
-			}
-			.printform .pdocinfo {
-				font-size: 15px;
-				color: #555;
-				margin-bottom: 12px;
-			}
-			.printform .prowheader {
-				background: #e9ecef;
-				font-weight: bold;
-				font-size: 15px;
-				border-radius: 4px 4px 0 0;
-			}
-			.printform table {
-				width: 100%;
-				border-collapse: collapse;
-				margin-bottom: 0;
-			}
-			.printform .prowitem td {
-				background: #fcfcfc;
-				border-bottom: 1px solid #eee;
-				padding: 7px 6px;
-				font-size: 15px;
-			}
-			.printform .prowheader td {
-				padding: 8px 6px;
-				border-bottom: 2px solid #ddd;
-			}
-			.printform .pfooter {
+			body {
+				margin: 0px;
+				font-family: Arial, sans-serif;
+				padding: 0px;
 				background: #f8f9fa;
-				font-size: 16px;
-				font-weight: bold;
-				color: #2a2a2a;
-				border-top: 2px solid #eee;
-				margin-top: 12px;
-				padding: 8px 0 0 0;
 			}
-			.printform .footer-note {
-				font-size: 13px;
-				color: #888;
-				margin-top: 8px;
+			.paper_width {
+				width: 396px;
+				margin: 32px auto 48px auto;
+				background: #fff;
+				border: 1px solid #bbb;
+				box-shadow: 0 2px 8px #0001;
+				padding: 0;
+			}
+			td {
+				line-height: 18px;
+			}
+			.demo-title {
+				text-align: center;
+				font-size: 1.3em;
+				font-weight: bold;
+				margin: 32px 0 12px 0;
+				color: #007bff;
+			}
+			@media print {
+				body { background: #fff; }
+				.demo-title, .print-btn { display: none !important; }
+				.paper_width { box-shadow: none; border: none; margin: 0; }
 			}
 			.print-btn {
-				position: absolute;
-				top: 16px;
-				right: 24px;
+				display: block;
+				margin: 12px auto 24px auto;
 				background: #007bff;
 				color: #fff;
 				border: none;
@@ -87,98 +47,340 @@
 				transition: background 0.2s;
 			}
 			.print-btn:hover { background: #0056b3; }
-			@media print {
-				.print-btn, .section-title, h1, p { display: none !important; }
-				body { background: #fff; }
-				.printform { box-shadow: none; border: none; margin: 0; }
-			}
-			.section-title { font-weight: bold; font-size: 1.2em; margin: 40px 0 12px 0; color: #007bff; }
 		</style>
 	</head>
 	<body>
-		<h1>Printform Demo: Professional Invoice & Receipt</h1>
-		<p>This demo shows two printforms on the same page, each with its own configuration and a more realistic, professional look. Click the print button on each form to print just that form.</p>
+		<div class="demo-title">Printform Demo: Classic Table-Based, Per-Form Config</div>
+		<p style="text-align:center;">This demo matches the style and logic of your original printforms, with per-form JS config and table-based layout.</p>
 
-		<!-- Printform 1: Invoice -->
-		<div class="section-title">Printform 1: Invoice (A5, header+footer, row height 27)</div>
-		<div class="printform"
-			 data-repeat-header="y"
-			 data-repeat-docinfo="y"
-			 data-repeat-rowheader="y"
-			 data-repeat-footer="y"
-			 data-repeat-footer-logo="n"
-			 data-insert-dummy-row-item-while-format-table="y"
-			 data-insert-dummy-row-while-format-table="n"
-			 data-insert-footer-spacer-while-format-table="y"
-			 data-insert-footer-spacer-with-dummy-row-item-while-format-table="y"
-			 data-papersize-width="396"
-			 data-papersize-height="550"
-			 data-height-of-dummy-row-item="27">
-			<!-- Print button for this form only -->
-			<button class="print-btn" onclick="printThisForm(this)">Print</button>
-			<!-- Company logo and info -->
-			<img src="img/letterhead_logo.jpg" alt="Company Logo" class="logo">
-			<div class="company-info">
-				<div>Sample Company Pte Ltd</div>
-				<div>123 Main Street, Singapore 123456</div>
-				<div>Tel: +65 1234 5678 | Email: info@sample.com</div>
-			</div>
-			<div class="pheader">INVOICE</div>
-			<div class="pdocinfo">Invoice #: INV-2024-001 &nbsp; | &nbsp; Date: 2024-06-01 &nbsp; | &nbsp; Due: 2024-06-15</div>
-			<table class="prowheader"><tr><td>Description</td><td>Qty</td><td>Unit Price</td><td>Amount</td></tr></table>
-			<table class="prowitem"><tr><td>Consulting Services</td><td>10</td><td>100.00</td><td>1,000.00</td></tr></table>
-			<table class="prowitem"><tr><td>Software License</td><td>1</td><td>500.00</td><td>500.00</td></tr></table>
-			<table class="prowitem"><tr><td>Support Fee</td><td>1</td><td>200.00</td><td>200.00</td></tr></table>
-			<table class="pfooter"><tr><td colspan="3" style="text-align:right;">Subtotal:</td><td>1,700.00</td></tr>
-				<tr><td colspan="3" style="text-align:right;">GST (8%):</td><td>136.00</td></tr>
-				<tr><td colspan="3" style="text-align:right;">Total:</td><td>1,836.00</td></tr>
-			</table>
-			<div class="footer-note">Thank you for your business!</div>
-		</div>
-
-		<!-- Printform 2: Receipt -->
-		<div class="section-title">Printform 2: Receipt (Custom size, no header/footer, row height 20)</div>
-		<div class="printform"
-			 data-repeat-header="n"
-			 data-repeat-docinfo="n"
-			 data-repeat-rowheader="y"
-			 data-repeat-footer="n"
-			 data-repeat-footer-logo="n"
-			 data-insert-dummy-row-item-while-format-table="n"
-			 data-insert-dummy-row-while-format-table="n"
-			 data-insert-footer-spacer-while-format-table="n"
-			 data-insert-footer-spacer-with-dummy-row-item-while-format-table="n"
-			 data-papersize-width="300"
-			 data-papersize-height="400"
-			 data-height-of-dummy-row-item="20">
-			<button class="print-btn" onclick="printThisForm(this)">Print</button>
-			<img src="img/footer_logo.jpg" alt="Shop Logo" class="logo">
-			<div class="company-info">
-				<div>Sample Mini Mart</div>
-				<div>456 Orchard Road, Singapore 654321</div>
-				<div>Tel: +65 8765 4321</div>
-			</div>
-			<div class="prowheader">
-				<table><tr><td>Item</td><td>Qty</td><td>Amount</td></tr></table>
-			</div>
-			<table class="prowitem"><tr><td>Apple</td><td>3</td><td>3.00</td></tr></table>
-			<table class="prowitem"><tr><td>Banana</td><td>2</td><td>2.00</td></tr></table>
-			<table class="prowitem"><tr><td>Orange</td><td>1</td><td>1.50</td></tr></table>
-			<div class="footer-note">No returns or exchanges after 7 days.</div>
-		</div>
-
-		<!-- JS: Printform logic -->
-		<script src="js/printform.js"></script>
+		<!-- Printform 1: Invoice style -->
 		<script>
-			// Print only the selected printform
-			function printThisForm(btn) {
-				var form = btn.closest('.printform');
-				var orig = document.body.innerHTML;
-				document.body.innerHTML = '';
-				document.body.appendChild(form.cloneNode(true));
-				window.print();
-				location.reload(); // reload to restore page
-			}
+			// Per-form config for Printform 1
+			var papersize_width = 396;
+			var papersize_height = 550;
+			var height_of_dummy_row_item = 27;
+			var repeat_header = "y";
+			var repeat_docinfo = "y";
+			var repeat_rowheader = "y";
+			var repeat_footer = "n";
+			var repeat_footer_logo = "y";
+			var insert_dummy_row_item_while_format_table = "y";
+			var insert_dummy_row_while_format_table = "y";
+			var insert_footer_spacer_while_format_table = "y";
+			var insert_footer_spacer_with_dummy_row_item_while_format_table = "y";
+			var custom_dummy_row_item_content = `
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
+							</tr>
+							<tr>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">&nbsp;</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;"></div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;"></div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;"></div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			`;
 		</script>
+		<button class="print-btn" onclick="window.print()">Print</button>
+		<div class="paper_width printform">
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pheader">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr style="height:10px;"></tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<img src="./img/letterhead_logo.jpg" style="height: auto; width: 100%;">
+						<font style="font-weight:600;font-size: 20px;">Sample Company Name</font><br>
+						<font style="font-size: 15px;">Address 1</font><br>
+						<font style="font-size: 15px;">Address 2</font><br>
+						<font style="font-size: 15px;">12345 Singapore</font><br>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+				<tr style="height:10px;"></tr>
+			</table>
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pdocinfo">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<font style="font-weight:600;font-size: 20px;">Invoice</font><br>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+				<tr style="height:10px;"></tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:130px;"></td>
+								<td style="box-sizing:border-box;width:130px;"></td>
+							</tr>
+							<tr>
+								<td style="box-sizing:border-box;"><div><font style="font-weight:600;font-size: 15px;">Sender</font></div></td>
+								<td style="box-sizing:border-box;"><div><font style="font-weight:600;font-size: 15px;">Payment To</font></div></td>
+								<td style="box-sizing:border-box;" align="right"><div><font style="font-weight:600;font-size: 15px;">Invoice Number</font></div></td>
+							</tr>
+							<tr>
+								<td style="box-sizing:border-box;"><div><font style="font-size: 13px;">sample</font></div></td>
+								<td style="box-sizing:border-box;"><div><font style="font-size: 13px;">sample</font></div></td>
+								<td style="box-sizing:border-box;" align="right"><div><font style="font-size: 13px;">sample</font></div></td>
+							</tr>
+							<tr style="height:10px;"></tr>
+							<tr>
+								<td style="box-sizing:border-box;"><div><font style="font-weight:600;font-size: 15px;">Receiver</font></div></td>
+								<td style="box-sizing:border-box;"><div><font style="font-weight:600;font-size: 15px;">Payment Method</font></div></td>
+								<td style="box-sizing:border-box;" align="right"><div><font style="font-weight:600;font-size: 15px;">Invoice Date</font></div></td>
+							</tr>
+							<tr>
+								<td style="box-sizing:border-box;"><div><font style="font-size: 13px;">sample</font></div></td>
+								<td style="box-sizing:border-box;"><div><font style="font-size: 13px;">sample</font></div></td>
+								<td style="box-sizing:border-box;" align="right"><div><font style="font-size: 13px;">sample</font></div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+				<tr style="height:10px;"></tr>
+			</table>
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width prowheader">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
+							</tr>
+							<tr>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:15px;font-weight:600;border-top:1px solid black;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">Description</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:15px;font-weight:600;border-top:1px solid black;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;">Qty</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:15px;font-weight:600;border-top:1px solid black;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;">UOM</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:15px;font-weight:600;border-top:1px solid black;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;">Price</div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			</table>
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width prowitem">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
+							</tr>
+							<tr>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">samplesamplesamplesample</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;">887.92</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;">KG</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;">100.00</div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			</table>
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pfooter_logo">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<img src="./img/footer_logo.jpg" style="height: auto; width: 100%;">
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			</table>
+		</div>
+
+		<!-- Printform 2: Receipt style (different config) -->
+		<script>
+			// Per-form config for Printform 2
+			var papersize_width = 396;
+			var papersize_height = 550;
+			var height_of_dummy_row_item = 27;
+			var repeat_header = "n";
+			var repeat_docinfo = "n";
+			var repeat_rowheader = "y";
+			var repeat_footer = "n";
+			var repeat_footer_logo = "n";
+			var insert_dummy_row_item_while_format_table = "y";
+			var insert_dummy_row_while_format_table = "y";
+			var insert_footer_spacer_while_format_table = "n";
+			var insert_footer_spacer_with_dummy_row_item_while_format_table = "y";
+			var custom_dummy_row_item_content = ``;
+		</script>
+		<button class="print-btn" onclick="window.print()">Print</button>
+		<div class="paper_width printform">
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pheader">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr style="height:10px;"></tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<img src="./img/letterhead_logo.jpg" style="height: auto; width: 100%;">
+						<font style="font-weight:600;font-size: 20px;">Sample Company Name</font><br>
+						<font style="font-size: 15px;">Address 1</font><br>
+						<font style="font-size: 15px;">Address 2</font><br>
+						<font style="font-size: 15px;">12345 Singapore</font><br>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+				<tr style="height:10px;"></tr>
+			</table>
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pdocinfo">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<font style="font-weight:600;font-size: 20px;">Invoice</font><br>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+				<tr style="height:10px;"></tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:130px;"></td>
+								<td style="box-sizing:border-box;width:130px;"></td>
+							</tr>
+							<tr>
+								<td style="box-sizing:border-box;"><div><font style="font-weight:600;font-size: 15px;">Sender</font></div></td>
+								<td style="box-sizing:border-box;"><div><font style="font-weight:600;font-size: 15px;">Payment To</font></div></td>
+								<td style="box-sizing:border-box;" align="right"><div><font style="font-weight:600;font-size: 15px;">Invoice Number</font></div></td>
+							</tr>
+							<tr>
+								<td style="box-sizing:border-box;"><div><font style="font-size: 13px;">sample</font></div></td>
+								<td style="box-sizing:border-box;"><div><font style="font-size: 13px;">sample</font></div></td>
+								<td style="box-sizing:border-box;" align="right"><div><font style="font-size: 13px;">sample</font></div></td>
+							</tr>
+							<tr style="height:10px;"></tr>
+							<tr>
+								<td style="box-sizing:border-box;"><div><font style="font-weight:600;font-size: 15px;">Receiver</font></div></td>
+								<td style="box-sizing:border-box;"><div><font style="font-weight:600;font-size: 15px;">Payment Method</font></div></td>
+								<td style="box-sizing:border-box;" align="right"><div><font style="font-weight:600;font-size: 15px;">Invoice Date</font></div></td>
+							</tr>
+							<tr>
+								<td style="box-sizing:border-box;"><div><font style="font-size: 13px;">sample</font></div></td>
+								<td style="box-sizing:border-box;"><div><font style="font-size: 13px;">sample</font></div></td>
+								<td style="box-sizing:border-box;" align="right"><div><font style="font-size: 13px;">sample</font></div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+				<tr style="height:10px;"></tr>
+			</table>
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width prowheader">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
+							</tr>
+							<tr>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:15px;font-weight:600;border-top:1px solid black;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">Description</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:15px;font-weight:600;border-top:1px solid black;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;">Qty</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:15px;font-weight:600;border-top:1px solid black;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;">UOM</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:15px;font-weight:600;border-top:1px solid black;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;">Price</div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			</table>
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width prowitem">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
+							</tr>
+							<tr>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">samplesamplesamplesample</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;">887.92</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;">KG</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;">100.00</div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			</table>
+		</div>
 	</body>
 </html>
