@@ -211,7 +211,6 @@ function printform_process(printformEl){
 		var pformat = document.createElement('div');
 		pformat.classList.add("printform_formatter");
 		printform.parentNode.insertBefore(pformat, printform);
-		pformat = document.querySelector(".printform_formatter");
 		
 		var pheader = printform.querySelector(".pheader");
 		var ph_height = parseFloat(pheader.getBoundingClientRect().height.toFixed(2));
