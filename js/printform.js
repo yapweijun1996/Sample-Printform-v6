@@ -16,6 +16,10 @@ var papersize_height = papersize_height || 1050; // Default to a standard A4 hei
 var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
 /****** Setting [end  ] ******/
 
+function formatIntl(num) {
+	return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }).format(num);
+}
+
 // [INJECT] Read per-form config from data-* attributes
 function getPrintformConfig(formEl) {
 	const ds = formEl.dataset;
@@ -137,14 +141,14 @@ function process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(
 		if(remaining_height_per_page > 0){
 			insert_dummy_row_item(pformat, remaining_height_per_page, height_of_dummy_row_item);
 			console.log("pformat : insert_dummy_row_item : "+ remaining_height_per_page);
-			remainder_for_remaining_height_per_page = parseFloat((remaining_height_per_page % height_of_dummy_row_item).toFixed(2));
+			remainder_for_remaining_height_per_page = formatIntl((remaining_height_per_page % height_of_dummy_row_item));
 			current_page_height = height_per_page - remainder_for_remaining_height_per_page;
 		}
 		
 		insert_footer_spacer_while_format_table = "n";
 	}
 	/***** insert_footer_spacer_with_dummy_row_item_while_format_table [end  ] *****/
-	var temp_value = parseFloat((current_page_height).toFixed(2));
+	var temp_value = formatIntl((current_page_height));
 	return temp_value;
 }
 
@@ -156,14 +160,14 @@ function process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_it
 		if(remaining_height_per_page > 0){
 			insert_dummy_row_item(pformat, remaining_height_per_page, height_of_dummy_row_item);
 			console.log("pformat : insert_dummy_row_item : "+ remaining_height_per_page);
-			remainder_for_remaining_height_per_page = parseFloat((remaining_height_per_page % height_of_dummy_row_item).toFixed(2));
+			remainder_for_remaining_height_per_page = formatIntl((remaining_height_per_page % height_of_dummy_row_item));
 			current_page_height = height_per_page - remainder_for_remaining_height_per_page;
 			cl("current_page_height");
 			cl(current_page_height);
 		}
 	}
 	/***** insert_dummy_row_item_while_format_table [end  ] *****/
-	var temp_value = parseFloat((current_page_height).toFixed(2));
+	var temp_value = formatIntl((current_page_height));
 	return temp_value;
 }
 
@@ -180,7 +184,7 @@ function process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_f
 		}
 	}
 	/***** insert_dummy_row_while_format_table [end  ] *****/
-	var temp_value = parseFloat((current_page_height).toFixed(2));
+	var temp_value = formatIntl((current_page_height));
 	return temp_value;
 }
 
@@ -273,30 +277,30 @@ async function printform_process(formEl, config){
 	pformat = document.querySelector(".printform_formatter");
 	
 	var pheader = printform.querySelector(".pheader");
-	var ph_height = parseFloat(pheader.getBoundingClientRect().height.toFixed(2));
+	var ph_height = formatIntl(pheader.getBoundingClientRect().height);
 	console.log("ph_height : " + ph_height);
 	
 	var pdocinfo = printform.querySelector(".pdocinfo");
-	var pdi_height = parseFloat(pdocinfo.getBoundingClientRect().height.toFixed(2));
+	var pdi_height = formatIntl(pdocinfo.getBoundingClientRect().height);
 	console.log("pdi_height : " + pdi_height);
 	
 	var prowheader = printform.querySelector(".prowheader");
-	var prh_height = parseFloat(prowheader.getBoundingClientRect().height.toFixed(2));
+	var prh_height = formatIntl(prowheader.getBoundingClientRect().height);
 	console.log("prd_height : " + prh_height);
 	
 	var pfooter = printform.querySelector(".pfooter");
-	var pf_height = parseFloat(pfooter.getBoundingClientRect().height.toFixed(2));
+	var pf_height = formatIntl(pfooter.getBoundingClientRect().height);
 	console.log("pf_height : " + pf_height);
 	
 	var pfooter_logo = printform.querySelector(".pfooter_logo");
-	var pfl_height = parseFloat(pfooter_logo.getBoundingClientRect().height.toFixed(2));
+	var pfl_height = formatIntl(pfooter_logo.getBoundingClientRect().height);
 	console.log("pfl_height : " + pfl_height);
 	
 	var prowitem = printform.querySelectorAll(".prowitem");
 	var pr_height = 0;
 	var temp;
 	for( var i = 0; i < prowitem.length ; i ++){
-		temp = parseFloat(prowitem[i].getBoundingClientRect().height.toFixed(2));
+		temp = formatIntl(prowitem[i].getBoundingClientRect().height);
 		if(temp != 0){
 			pr_height += temp;
 		}
@@ -361,7 +365,7 @@ async function printform_process(formEl, config){
 	
 	// Loop all row item [start]
 	for( var i = 0; i < prowitem.length ; i ++){
-		temp = parseFloat(prowitem[i].getBoundingClientRect().height.toFixed(2));
+		temp = formatIntl(prowitem[i].getBoundingClientRect().height);
 		
 		if(current_page_height == 0){
 			addHeader(pheader, pformat);
