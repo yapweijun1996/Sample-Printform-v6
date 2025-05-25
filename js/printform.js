@@ -43,15 +43,12 @@ function add_dummy_row_item(target_element, height_of_dummy_row_item){
 }
 
 function insert_dummy_row_item(target_element, diff_height_from_papersize, height_of_dummy_row){
-	// Add spacer [start] insert dummy row item
-	if(diff_height_from_papersize > 0){
-		var number_of_dummy_row_item_will_be_insert = 0;
-		number_of_dummy_row_item_will_be_insert = Math.floor(diff_height_from_papersize / height_of_dummy_row);
-		for( var i = 0 ; i < number_of_dummy_row_item_will_be_insert ; i++){
+	if (diff_height_from_papersize > 0) {
+		const count = Math.floor(diff_height_from_papersize / height_of_dummy_row);
+		for (let i = 0; i < count; i++) {
 			add_dummy_row_item(target_element, height_of_dummy_row);
 		}
 	}
-	// Add spacer [end  ] insert dummy row item
 }
 
 function process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat){
@@ -97,8 +94,8 @@ function process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(
 		insert_footer_spacer_while_format_table = "n";
 	}
 	/***** insert_footer_spacer_with_dummy_row_item_while_format_table [end  ] *****/
-	var temp_value = parseFloat((current_page_height).toFixed(2));
-	return temp_value;
+	const tempValue = parseFloat(current_page_height.toFixed(2));
+	return tempValue;
 }
 
 function process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item){
@@ -116,8 +113,8 @@ function process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_it
 		}
 	}
 	/***** insert_dummy_row_item_while_format_table [end  ] *****/
-	var temp_value = parseFloat((current_page_height).toFixed(2));
-	return temp_value;
+	const tempValue = parseFloat(current_page_height.toFixed(2));
+	return tempValue;
 }
 
 function process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width){
@@ -133,8 +130,8 @@ function process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_f
 		}
 	}
 	/***** insert_dummy_row_while_format_table [end  ] *****/
-	var temp_value = parseFloat((current_page_height).toFixed(2));
-	return temp_value;
+	const tempValue = parseFloat(current_page_height.toFixed(2));
+	return tempValue;
 }
 
 function addRowHeader(prowheader, pformat){
@@ -180,11 +177,11 @@ function addRowItem(prowitem, temp_no, pformat){
 }
 
 function addProcessedInClassName(input_ele, input_classname){
-	var temp_class_name = input_classname;
-	var temp_class_name_new = input_classname + "_processed";
+	const tempClassName = input_classname;
+	const tempClassNameNew = `${input_classname}_processed`;
 	
-	input_ele.classList.remove(temp_class_name);
-	input_ele.classList.add(temp_class_name_new);
+	input_ele.classList.remove(tempClassName);
+	input_ele.classList.add(tempClassNameNew);
 }
 
 
@@ -537,10 +534,10 @@ function pause_in_milliseconds(time) {
 }
 
 async function run_function_sequentially() {
-	var printform = document.querySelectorAll(".printform");
-	var prinbform_no =  printform.length;
-	console.log(prinbform_no);
-	for(var i = 0; i < prinbform_no; i ++){
+	const printforms = document.querySelectorAll(".printform");
+	const count = printforms.length;
+	console.log(count);
+	for (let i = 0; i < count; i++) {
 		try{await pause_in_milliseconds(1);}catch(error){console.error("pause_in_milliseconds error");}
 		try{await printform_process();}     catch(error){console.error("printform_process error");}
 	}
