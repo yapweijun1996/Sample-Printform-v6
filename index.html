@@ -11,7 +11,7 @@
 				padding: 0px;
 			}
 			.paper_width{
-				width:750px;
+				width:396px;
 			}
 			td{
 				line-height:18px;
@@ -19,41 +19,62 @@
 		</style>
 		
 		<script>
-			// Content of this script block (global JS variables for config) is now removed.
-			// Configuration is handled by data-* attributes on the .printform div 
-			// and defaults in printform.js.
-		</script>
-	</head>
-	<body>
-		
-		<div class="paper_width printform"
-			data-papersize-width="750"
-			data-papersize-height="1050"
-			data-height-of-dummy-row-item="27"
-			data-repeat-header="y"
-			data-repeat-docinfo="y"
-			data-repeat-rowheader="y"
-			data-repeat-footer="n"
-			data-repeat-footer-logo="y"
-			data-insert-dummy-row-item-while-format-table="y"
-			data-insert-dummy-row-while-format-table="y"
-			data-insert-footer-spacer-while-format-table="y"
-			data-insert-footer-spacer-with-dummy-row-item-while-format-table="y"
-			data-custom-dummy-row-item-content='<tr><td style="box-sizing:border-box;width:15px;"></td><td style="box-sizing:border-box;width:inherit;"></td><td style="box-sizing:border-box;width:15px;"></td></tr><tr><td style="box-sizing:border-box;"></td><td style="box-sizing:border-box;"><table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0"><tr><td style="box-sizing:border-box;width:inherit;"></td><td style="box-sizing:border-box;width:50px;"></td><td style="box-sizing:border-box;width:42px;"></td><td style="box-sizing:border-box;width:78px;"></td></tr><tr><td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">&nbsp;</div></td><td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;"></div></td><td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;"></div></td><td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;"></div></td></tr></table></td><td style="box-sizing:border-box;"></td></tr>'>
-			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pheader">
+			var papersize_width = 396; // 795px is A4 width, 6.35mm is 24px
+			var papersize_height = 550;
+			var height_of_dummy_row_item = 27;
+			
+			var repeat_header                                                = "y";
+			var repeat_docinfo                                               = "y";
+			var repeat_rowheader                                             = "y";
+			var repeat_footer                                                = "y";
+			var repeat_footer_logo                                           = "y";
+			var insert_dummy_row_item_while_format_table                     = "y";
+			var insert_dummy_row_while_format_table                          = "y";
+			var insert_footer_spacer_while_format_table                      = "y";
+			var insert_footer_spacer_with_dummy_row_item_while_format_table  = "y";
+			var custom_dummy_row_item_content                                = `
 				<tr>
 					<td style="box-sizing:border-box;width:15px;"></td>
 					<td style="box-sizing:border-box;width:inherit;"></td>
 					<td style="box-sizing:border-box;width:15px;"></td>
 				</tr>
 				<tr>
-					<td style="box-sizing:border-box;" colspan="3">
-						<img src="./img/letterhead_logo.jpg" style="height: auto; width: 100%;">
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
+							</tr>
+							<tr>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">&nbsp;</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;"></div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;"></div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;"></div></td>
+							</tr>
+						</table>
 					</td>
+					<td style="box-sizing:border-box;"></td>
 				</tr>
+			`;
+		</script>
+	</head>
+	<body>
+		
+		<div class="paper_width printform">
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pheader">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr style="height:10px;"></tr>
 				<tr>
 					<td style="box-sizing:border-box;"></td>
 					<td style="box-sizing:border-box;">
+						<img src="./img/letterhead_logo.jpg" style="height: auto; width: 100%;">
 						<font style="font-weight:600;font-size: 20px;">Sample Company Name</font><br>
 						<font style="font-size: 15px;">Address 1</font><br>
 						<font style="font-size: 15px;">Address 2</font><br>
@@ -361,6 +382,92 @@
 				</tr>
 			</table>
 			
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width prowitem">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
+							</tr>
+							<tr>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">samplesamplesamplesample</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;">887.92</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;">KG</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;">100.00</div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			</table>
+			
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width prowitem">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
+							</tr>
+							<tr>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">samplesamplesamplesample</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;">887.92</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;">KG</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;">100.00</div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			</table>
+			
+			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width prowitem">
+				<tr>
+					<td style="box-sizing:border-box;width:15px;"></td>
+					<td style="box-sizing:border-box;width:inherit;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
+				</tr>
+				<tr>
+					<td style="box-sizing:border-box;"></td>
+					<td style="box-sizing:border-box;">
+						<table cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;" border="0">
+							<tr>
+								<td style="box-sizing:border-box;width:inherit;"></td>
+								<td style="box-sizing:border-box;width:50px;"></td>
+								<td style="box-sizing:border-box;width:42px;"></td>
+								<td style="box-sizing:border-box;width:78px;"></td>
+							</tr>
+							<tr>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;"><div style="padding:3px 3px 3px 0px;">samplesamplesamplesample</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 3px 3px 3px;">887.92</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;"><div style="padding:3px 3px 3px 3px;">KG</div></td>
+								<td style="line-height: 20px;box-sizing:border-box;font-size:13px;border-bottom:1px solid black;border-right:1px solid black;" align="right"><div style="padding:3px 0px 3px 3px;">100.00</div></td>
+							</tr>
+						</table>
+					</td>
+					<td style="box-sizing:border-box;"></td>
+				</tr>
+			</table>
+			
+			<!-- repeat prowitem [start] -->
+			
 			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pfooter">
 				<tr>
 					<td style="box-sizing:border-box;width:15px;"></td>
@@ -403,9 +510,9 @@
 			
 			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pfooter_logo">
 				<tr>
-					<td style="box-sizing:border-box;width:0px;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
 					<td style="box-sizing:border-box;width:inherit;"></td>
-					<td style="box-sizing:border-box;width:0px;"></td>
+					<td style="box-sizing:border-box;width:15px;"></td>
 				</tr>
 				<tr>
 					<td style="box-sizing:border-box;"></td>
@@ -417,77 +524,6 @@
 				</tr>
 			</table>
 		</div>
-
-		<hr style="margin-top: 20px; margin-bottom: 20px; border: 0; border-top: 1px solid #ccc;">
-		<h2 style="text-align: center; font-family: Arial, sans-serif; color: #333;">Second Print Form (Different Configuration)</h2>
-
-		<div class="paper_width printform" style="margin: 20px auto; border: 1px solid #ddd; padding: 10px; background-color: #f9f9f9;"
-			 data-papersize-width="350" 
-			 data-papersize-height="500"
-			 data-height-of-dummy-row-item="20"
-			 data-repeat-header="n"
-			 data-repeat-docinfo="n"
-			 data-repeat-rowheader="y"
-			 data-repeat-footer="n"
-			 data-repeat-footer-logo="n"
-			 data-insert-dummy-row-item-while-format-table="y"
-			 data-insert-dummy-row-while-format-table="n"
-			 data-insert-footer-spacer-while-format-table="n"
-			 data-insert-footer-spacer-with-dummy-row-item-while-format-table="n"
-			 data-custom-dummy-row-item-content='<tr><td style="height:20px; border:1px dashed #eee; text-align:center; color:#aaa; font-size:10px;">dummy fill</td></tr>'>
-
-			<style>
-				/* Styles specific to this second print form example, if needed */
-				.form2-header-footer {
-					background-color: #e9e9e9;
-					padding: 8px;
-					text-align: center;
-					font-weight: bold;
-				}
-				.form2-item {
-					border-bottom: 1px solid #d0d0d0;
-					padding: 5px;
-					line-height: 1.4;
-				}
-			</style>
-
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width pheader">
-				<tr><td class="form2-header-footer">Second Form Header (Config: No Repeat)</td></tr>
-			</table>
-
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width pdocinfo">
-				<tr><td style="padding: 8px; border-bottom: 1px solid #ccc;">Info for Second Form (Config: No Repeat)</td></tr>
-			</table>
-
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width prowheader">
-				<tr><td style="font-weight: bold; border-bottom: 2px solid black; padding: 6px; background-color:#f0f0f0;">Item Description (Form 2 - Repeated Row Header)</td></tr>
-			</table>
-
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width prowitem">
-				<tr><td class="form2-item">Form 2 - Item 1</td></tr>
-			</table>
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width prowitem">
-				<tr><td class="form2-item">Form 2 - Item 2: This item has more content to demonstrate how text flows and potentially causes page breaks in this smaller, differently configured form. This should ideally wrap and continue on the next page if it exceeds the available space for items.</td></tr>
-			</table>
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width prowitem">
-				<tr><td class="form2-item">Form 2 - Item 3</td></tr>
-			</table>
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width prowitem">
-				<tr><td class="form2-item">Form 2 - Item 4</td></tr>
-			</table>
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width prowitem">
-				<tr><td class="form2-item">Form 2 - Item 5 (Last item for this form)</td></tr>
-			</table>
-
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width pfooter">
-				<tr><td class="form2-header-footer">Second Form Footer (Config: No Repeat)</td></tr>
-			</table>
-
-			<table cellpadding="0" cellspacing="0" style="width:100%; table-layout:fixed;" border="0" class="paper_width pfooter_logo">
-				<tr><td style="padding: 8px; text-align: center; font-style: italic;">Second Form Logo Area (Config: No Repeat)</td></tr>
-			</table>
-		</div>
-
 		<script src="./js/printform.js"></script>
 		
 		<!-- extra tools [start] -->
