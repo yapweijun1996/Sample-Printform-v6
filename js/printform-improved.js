@@ -6,7 +6,10 @@
  * @author Improved by AI Assistant
  */
 
-class PrintFormConfig {
+// Prevent redeclaration errors
+if (typeof window.PrintFormConfig === 'undefined') {
+
+window.PrintFormConfig = class PrintFormConfig {
     constructor(options = {}) {
         // Use boolean values instead of strings for better type safety
         this.repeatHeader = options.repeatHeader ?? true;
@@ -31,9 +34,12 @@ class PrintFormConfig {
     }
 }
 
-class PrintFormProcessor {
+// Prevent redeclaration errors for PrintFormProcessor
+if (typeof window.PrintFormProcessor === 'undefined') {
+
+window.PrintFormProcessor = class PrintFormProcessor {
     constructor(config = {}) {
-        this.config = new PrintFormConfig(config);
+        this.config = new window.PrintFormConfig(config);
         this.isProcessed = false;
     }
 
@@ -500,7 +506,7 @@ async function processAllPrintForms(config = {}) {
     for (let i = 0; i < printForms.length; i++) {
         try {
             await delay(1); // Small delay between processing
-            const processor = new PrintFormProcessor(config);
+            const processor = new window.PrintFormProcessor(config);
             await processor.process();
             console.log(`Processed print form ${i + 1}/${printForms.length}`);
         } catch (error) {
@@ -533,11 +539,17 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 10);
 });
 
+// Close the PrintFormProcessor class definition
+}
+
+// Close the PrintFormConfig class definition
+}
+
 // Export for module usage
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
-        PrintFormProcessor,
-        PrintFormConfig,
+        PrintFormProcessor: window.PrintFormProcessor,
+        PrintFormConfig: window.PrintFormConfig,
         processAllPrintForms,
         delay
     };
