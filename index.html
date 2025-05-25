@@ -21,7 +21,19 @@
 		
 	</head>
 	<body>
-		
+		<!--
+		  Printform container logic:
+		  - This <div> wraps all tables for one print section.
+		  - Control print layout and pagination using these data-* attributes:
+		      data-papersize-width / data-papersize-height: set page size (px)
+		      data-height-of-dummy-row-item: height for filler rows (px)
+		      data-repeat-header / data-repeat-docinfo / data-repeat-rowheader / data-repeat-footer / data-repeat-footer-logo: repeat these sections on every page ("y" or "n")
+		      data-insert-dummy-row-item-while-format-table: fill space with dummy rows ("y" or "n")
+		      data-insert-dummy-row-while-format-table: fill with full dummy tables ("y" or "n")
+		      data-insert-footer-spacer-while-format-table: add a spacer before footer ("y" or "n")
+		      data-insert-footer-spacer-with-dummy-row-item-while-format-table: spacer + dummy rows ("y" or "n")
+		  - To customize the dummy row markup, add a <template class="custom-dummy-row-item-content"> inside this div.
+		-->
 		<div class="paper_width printform"
 			 data-papersize-width="750"
 			 data-papersize-height="1050"
