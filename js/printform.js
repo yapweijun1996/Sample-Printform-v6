@@ -1,21 +1,34 @@
 /****** Setting [start] ******/
-var repeat_header = repeat_header || "y";
-var repeat_docinfo = repeat_docinfo || "y";
-var repeat_rowheader = repeat_rowheader || "y";
-var repeat_footer = repeat_footer || "n";
-var repeat_footer_logo = repeat_footer_logo || "n";
-var insert_dummy_row_item_while_format_table = insert_dummy_row_item_while_format_table || "y";
-var insert_dummy_row_while_format_table = insert_dummy_row_while_format_table || "n";
-var insert_footer_spacer_while_format_table = insert_footer_spacer_while_format_table || "y";
-var insert_footer_spacer_with_dummy_row_item_while_format_table = insert_footer_spacer_with_dummy_row_item_while_format_table || "y";
-var custom_dummy_row_item_content = custom_dummy_row_item_content || "";
+var repeat_header = (typeof repeat_header === 'undefined') ? "y" : repeat_header;
+var repeat_docinfo = (typeof repeat_docinfo === 'undefined') ? "y" : repeat_docinfo;
+var repeat_rowheader = (typeof repeat_rowheader === 'undefined') ? "y" : repeat_rowheader;
+var repeat_footer = (typeof repeat_footer === 'undefined') ? "n" : repeat_footer;
+var repeat_footer_logo = (typeof repeat_footer_logo === 'undefined') ? "n" : repeat_footer_logo;
+var insert_dummy_row_item_while_format_table = (typeof insert_dummy_row_item_while_format_table === 'undefined') ? "y" : insert_dummy_row_item_while_format_table;
+var insert_dummy_row_while_format_table = (typeof insert_dummy_row_while_format_table === 'undefined') ? "n" : insert_dummy_row_while_format_table;
+var insert_footer_spacer_while_format_table = (typeof insert_footer_spacer_while_format_table === 'undefined') ? "y" : insert_footer_spacer_while_format_table;
+var insert_footer_spacer_with_dummy_row_item_while_format_table = (typeof insert_footer_spacer_with_dummy_row_item_while_format_table === 'undefined') ? "y" : insert_footer_spacer_with_dummy_row_item_while_format_table;
+var custom_dummy_row_item_content = (typeof custom_dummy_row_item_content === 'undefined') ? "" : custom_dummy_row_item_content;
 
-// Assuming vle_temp_paper_width and vle_temp_paper_height are defined somewhere
-var papersize_width = papersize_width || 750; // Default to 795px (A4 width)
-var papersize_height = papersize_height || 1050; // Default to a standard A4 height (1122px)
-var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
+var papersize_width = (typeof papersize_width === 'undefined') ? 750 : papersize_width;
+var papersize_height = (typeof papersize_height === 'undefined') ? 1050 : papersize_height;
+var height_of_dummy_row_item = (typeof height_of_dummy_row_item === 'undefined' || height_of_dummy_row_item <= 0) ? 18 : height_of_dummy_row_item;
 /****** Setting [end  ] ******/
 
+// Helper to normalize all flags to 'y' or 'n'
+function normalizeFlag(flag) {
+    var v = String(flag).toLowerCase();
+    return (v === 'y' || v === 'n') ? v : 'n';
+}
+repeat_header = normalizeFlag(repeat_header);
+repeat_docinfo = normalizeFlag(repeat_docinfo);
+repeat_rowheader = normalizeFlag(repeat_rowheader);
+repeat_footer = normalizeFlag(repeat_footer);
+repeat_footer_logo = normalizeFlag(repeat_footer_logo);
+insert_dummy_row_item_while_format_table = normalizeFlag(insert_dummy_row_item_while_format_table);
+insert_dummy_row_while_format_table = normalizeFlag(insert_dummy_row_while_format_table);
+insert_footer_spacer_while_format_table = normalizeFlag(insert_footer_spacer_while_format_table);
+insert_footer_spacer_with_dummy_row_item_while_format_table = normalizeFlag(insert_footer_spacer_with_dummy_row_item_while_format_table);
 
 function add_dummy_row(target_element, papersize_width, height_of_dummy_row){
 	
@@ -72,15 +85,13 @@ function insert_dummy_row_item(target_element, diff_height_from_papersize, heigh
 function process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat){
 	console.log("process_to_insert_footer_spacer_while_format_table : start");
 	/***** insert_footer_spacer_while_format_table [start] *****/
-	if(insert_footer_spacer_while_format_table == "y"){
-		clone_pfooter_spacer = pfooter_spacer.cloneNode(true);
-		
-		remaining_height_per_page = height_per_page - current_page_height;
-		
-		if(repeat_footer_logo != "y"){
-			remaining_height_per_page = remaining_height_per_page - pfl_height;
+	if (insert_footer_spacer_while_format_table === "y") {
+		let clone_pfooter_spacer = pfooter_spacer.cloneNode(true);
+		let remaining_height_per_page = height_per_page - current_page_height;
+		if (repeat_footer_logo !== "y") {
+			remaining_height_per_page -= pfl_height;
 		}
-		if(remaining_height_per_page){
+		if (remaining_height_per_page) {
 			clone_pfooter_spacer.style.height = remaining_height_per_page + "px";
 		}
 		pformat.appendChild(clone_pfooter_spacer);
@@ -91,24 +102,22 @@ function process_to_insert_footer_spacer_while_format_table(insert_footer_spacer
 function process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat){
 	console.log("process_to_insert_footer_spacer_with_dummy_row_item_while_format_table : start");
 	/***** insert_footer_spacer_with_dummy_row_item_while_format_table [start] *****/
-	if(insert_footer_spacer_with_dummy_row_item_while_format_table == "y"){
-		remaining_height_per_page = height_per_page - current_page_height;
-		console.log("pformat : height_per_page : "+ height_per_page);
-		console.log("pformat : current_page_height : "+ current_page_height);
-		console.log("pformat : remaining_height_per_page : "+ remaining_height_per_page);
-			
-		if(repeat_footer_logo != "y"){
-			//remaining_height_per_page = remaining_height_per_page - pfl_height;
+	if (insert_footer_spacer_with_dummy_row_item_while_format_table === "y") {
+		let remaining_height_per_page = height_per_page - current_page_height;
+		console.log("pformat : height_per_page : " + height_per_page);
+		console.log("pformat : current_page_height : " + current_page_height);
+		console.log("pformat : remaining_height_per_page : " + remaining_height_per_page);
+		if (repeat_footer_logo !== "y") {
+			// remaining_height_per_page -= pfl_height;
 		}
-		console.log("pformat : current_page_height : "+ current_page_height);
-		console.log("pformat : remaining_height_per_page : "+ remaining_height_per_page);
-		if(remaining_height_per_page > 0){
+		console.log("pformat : current_page_height : " + current_page_height);
+		console.log("pformat : remaining_height_per_page : " + remaining_height_per_page);
+		if (remaining_height_per_page > 0) {
 			insert_dummy_row_item(pformat, remaining_height_per_page, height_of_dummy_row_item);
-			console.log("pformat : insert_dummy_row_item : "+ remaining_height_per_page);
-			remainder_for_remaining_height_per_page = parseFloat((remaining_height_per_page % height_of_dummy_row_item).toFixed(2));
+			console.log("pformat : insert_dummy_row_item : " + remaining_height_per_page);
+			let remainder_for_remaining_height_per_page = parseFloat((remaining_height_per_page % height_of_dummy_row_item).toFixed(2));
 			current_page_height = height_per_page - remainder_for_remaining_height_per_page;
 		}
-		
 		insert_footer_spacer_while_format_table = "n";
 	}
 	/***** insert_footer_spacer_with_dummy_row_item_while_format_table [end  ] *****/
@@ -119,15 +128,13 @@ function process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(
 function process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item){
 	console.log("process_to_insert_dummy_row_item_while_format_table : start");
 	/***** insert_dummy_row_item_while_format_table [start] *****/
-	if(insert_dummy_row_item_while_format_table == "y"){
-		remaining_height_per_page = height_per_page - current_page_height;
-		if(remaining_height_per_page > 0){
+	if (insert_dummy_row_item_while_format_table === "y") {
+		let remaining_height_per_page = height_per_page - current_page_height;
+		if (remaining_height_per_page > 0) {
 			insert_dummy_row_item(pformat, remaining_height_per_page, height_of_dummy_row_item);
-			console.log("pformat : insert_dummy_row_item : "+ remaining_height_per_page);
-			remainder_for_remaining_height_per_page = parseFloat((remaining_height_per_page % height_of_dummy_row_item).toFixed(2));
+			console.log("pformat : insert_dummy_row_item : " + remaining_height_per_page);
+			let remainder_for_remaining_height_per_page = parseFloat((remaining_height_per_page % height_of_dummy_row_item).toFixed(2));
 			current_page_height = height_per_page - remainder_for_remaining_height_per_page;
-			cl("current_page_height");
-			cl(current_page_height);
 		}
 	}
 	/***** insert_dummy_row_item_while_format_table [end  ] *****/
@@ -138,12 +145,11 @@ function process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_it
 function process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width){
 	console.log("process_to_insert_dummy_row_item_while_format_table : start");
 	/***** insert_dummy_row_while_format_table [start] *****/
-	if(insert_dummy_row_while_format_table == "y"){
-		remaining_height_per_page = height_per_page - current_page_height;
-		
-		if(remaining_height_per_page > 0){
+	if (insert_dummy_row_while_format_table === "y") {
+		let remaining_height_per_page = height_per_page - current_page_height;
+		if (remaining_height_per_page > 0) {
 			add_dummy_row(pformat, papersize_width, remaining_height_per_page);
-			console.log("pformat : add_dummy_row : "+ remaining_height_per_page);
+			console.log("pformat : add_dummy_row : " + remaining_height_per_page);
 			current_page_height += remaining_height_per_page;
 		}
 	}
@@ -561,11 +567,32 @@ async function run_function_sequentially() {
 	}
 }
 
-if(!run_function_sequentially_processed){ var run_function_sequentially_processed = false; }
+// Setup processing guard and function
+let run_function_sequentially_processed = false;
+function initiatePrintformProcessing() {
+    if (!run_function_sequentially_processed) {
+        run_function_sequentially();
+        run_function_sequentially_processed = true;
+    }
+}
 
-window.onload = function() {
-    if(run_function_sequentially_processed == false){
-		run_function_sequentially();
-		run_function_sequentially_processed = true;
-	}
-};
+// Process on initial DOM load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initiatePrintformProcessing);
+} else {
+    initiatePrintformProcessing();
+}
+
+// Observe dynamic additions of printform elements
+const printformObserver = new MutationObserver(mutations => {
+    for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+            if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('printform')) {
+                initiatePrintformProcessing();
+            }
+        }
+    }
+});
+printformObserver.observe(document.body, { childList: true, subtree: true });
+
+// Pagination helper stub removed; further consolidation will be applied inside printform_process function.
