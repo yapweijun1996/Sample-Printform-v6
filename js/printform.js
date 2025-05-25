@@ -587,6 +587,7 @@ async function printform_process(formEl, config){
 	
 	printform.remove();
 	console.log("printform : remove");
+	return pformat;
 }
 /***** Generate Page [end  ] *****/
 
@@ -609,11 +610,21 @@ function pause_in_milliseconds(time) {
 async function processAllPrintForms() {
 	window.run_function_sequentially_processed = window.run_function_sequentially_processed || false;
 	if (window.run_function_sequentially_processed) return;
-	const forms = document.querySelectorAll(".printform");
-	for (const formEl of forms) {
+	const forms = Array.from(document.querySelectorAll(".printform"));
+	for (let idx = 0; idx < forms.length; idx++) {
+		const formEl = forms[idx];
 		const cfg = getPrintformConfig(formEl);
 		try { await pause_in_milliseconds(1); } catch (error) { console.error("pause_in_milliseconds error"); }
-		try { await printform_process(formEl, cfg); } catch (error) { console.error("printform_process error"); }
+		let pformat;
+		try { pformat = await printform_process(formEl, cfg); } catch (error) { console.error("printform_process error"); }
+		// insert inter-form page break before each formatted block except the first
+		if (idx > 0 && pformat && pformat.parentNode) {
+			const breakDiv = document.createElement('div');
+			breakDiv.classList.add('div_page_break_before');
+			breakDiv.style.pageBreakBefore = 'always';
+			breakDiv.style.height = '0px';
+			pformat.parentNode.insertBefore(breakDiv, pformat);
+		}
 	}
 	window.run_function_sequentially_processed = true;
 }
