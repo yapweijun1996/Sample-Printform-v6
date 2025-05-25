@@ -548,9 +548,29 @@ async function run_function_sequentially() {
 
 if(!run_function_sequentially_processed){ var run_function_sequentially_processed = false; }
 
-window.onload = function() {
-    if(run_function_sequentially_processed == false){
-		run_function_sequentially();
-		run_function_sequentially_processed = true;
-	}
-};
+// ES module: expose init and render functions
+export function initPrintFormOptions(opts = {}) {
+    if (opts.repeatHeader !== undefined) repeat_header = opts.repeatHeader ? "y" : "n";
+    if (opts.repeatDocInfo !== undefined) repeat_docinfo = opts.repeatDocInfo ? "y" : "n";
+    if (opts.repeatRowHeader !== undefined) repeat_rowheader = opts.repeatRowHeader ? "y" : "n";
+    if (opts.repeatFooter !== undefined) repeat_footer = opts.repeatFooter ? "y" : "n";
+    if (opts.repeatFooterLogo !== undefined) repeat_footer_logo = opts.repeatFooterLogo ? "y" : "n";
+    if (opts.insertDummyRowItem !== undefined) insert_dummy_row_item_while_format_table = opts.insertDummyRowItem ? "y" : "n";
+    if (opts.insertDummyRow !== undefined) insert_dummy_row_while_format_table = opts.insertDummyRow ? "y" : "n";
+    if (opts.insertFooterSpacer !== undefined) insert_footer_spacer_while_format_table = opts.insertFooterSpacer ? "y" : "n";
+    if (opts.insertFooterSpacerWithDummy !== undefined) insert_footer_spacer_with_dummy_row_item_while_format_table = opts.insertFooterSpacerWithDummy ? "y" : "n";
+    if (opts.customDummyRowContent !== undefined) custom_dummy_row_item_content = opts.customDummyRowContent;
+    if (opts.papersizeWidth !== undefined) papersize_width = opts.papersizeWidth;
+    if (opts.papersizeHeight !== undefined) papersize_height = opts.papersizeHeight;
+    if (opts.dummyRowHeight !== undefined) height_of_dummy_row_item = opts.dummyRowHeight;
+}
+
+export async function renderPrintForms(options = {}) {
+    initPrintFormOptions(options);
+    if (!run_function_sequentially_processed) {
+        await run_function_sequentially();
+        run_function_sequentially_processed = true;
+    }
+}
+
+export default { initPrintFormOptions, renderPrintForms };
