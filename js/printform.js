@@ -202,51 +202,35 @@ function addProcessedInClassName(input_ele, input_classname){
 	input_ele.classList.add(temp_class_name_new);
 }
 
-/*** Helper: Read config from data attributes [start] ***/
-function getConfigFromElement(element) {
-	return {
-		repeat_header: element.getAttribute('data-repeat-header') || 'y',
-		repeat_docinfo: element.getAttribute('data-repeat-docinfo') || 'y',
-		repeat_rowheader: element.getAttribute('data-repeat-rowheader') || 'y',
-		repeat_footer: element.getAttribute('data-repeat-footer') || 'n',
-		repeat_footer_logo: element.getAttribute('data-repeat-footer-logo') || 'n',
-		insert_dummy_row_item_while_format_table: element.getAttribute('data-insert-dummy-row-item-while-format-table') || 'y',
-		insert_dummy_row_while_format_table: element.getAttribute('data-insert-dummy-row-while-format-table') || 'y',
-		insert_footer_spacer_while_format_table: element.getAttribute('data-insert-footer-spacer-while-format-table') || 'y',
-		insert_footer_spacer_with_dummy_row_item_while_format_table: element.getAttribute('data-insert-footer-spacer-with-dummy-row-item-while-format-table') || 'y',
-		custom_dummy_row_item_content: element.getAttribute('data-custom-dummy-row-item-content') || '',
-		papersize_width: parseInt(element.getAttribute('data-papersize-width'), 10) || 396,
-		papersize_height: parseInt(element.getAttribute('data-papersize-height'), 10) || 550,
-		height_of_dummy_row_item: parseInt(element.getAttribute('data-height-of-dummy-row-item'), 10) || 27
-	};
-}
-/*** Helper: Read config from data attributes [end] ***/
 
-function printform_process(printform, config) {
+function printform_process(){
+	
 	return new Promise(resolve => {
+		
+		var printform = document.querySelector(".printform");
 		var pformat = document.createElement('div');
 		pformat.classList.add("printform_formatter");
 		printform.parentNode.insertBefore(pformat, printform);
-		pformat = printform.parentNode.querySelector(".printform_formatter");
+		pformat = document.querySelector(".printform_formatter");
 		
 		var pheader = printform.querySelector(".pheader");
-		var ph_height = pheader ? parseFloat(pheader.getBoundingClientRect().height.toFixed(2)) : 0;
+		var ph_height = parseFloat(pheader.getBoundingClientRect().height.toFixed(2));
 		console.log("ph_height : " + ph_height);
 		
 		var pdocinfo = printform.querySelector(".pdocinfo");
-		var pdi_height = pdocinfo ? parseFloat(pdocinfo.getBoundingClientRect().height.toFixed(2)) : 0;
+		var pdi_height = parseFloat(pdocinfo.getBoundingClientRect().height.toFixed(2));
 		console.log("pdi_height : " + pdi_height);
 		
 		var prowheader = printform.querySelector(".prowheader");
-		var prh_height = prowheader ? parseFloat(prowheader.getBoundingClientRect().height.toFixed(2)) : 0;
+		var prh_height = parseFloat(prowheader.getBoundingClientRect().height.toFixed(2));
 		console.log("prd_height : " + prh_height);
 		
 		var pfooter = printform.querySelector(".pfooter");
-		var pf_height = pfooter ? parseFloat(pfooter.getBoundingClientRect().height.toFixed(2)) : 0;
+		var pf_height = parseFloat(pfooter.getBoundingClientRect().height.toFixed(2));
 		console.log("pf_height : " + pf_height);
 		
 		var pfooter_logo = printform.querySelector(".pfooter_logo");
-		var pfl_height = pfooter_logo ? parseFloat(pfooter_logo.getBoundingClientRect().height.toFixed(2)) : 0;
+		var pfl_height = parseFloat(pfooter_logo.getBoundingClientRect().height.toFixed(2));
 		console.log("pfl_height : " + pfl_height);
 		
 		var prowitem = printform.querySelectorAll(".prowitem");
@@ -286,25 +270,25 @@ function printform_process(printform, config) {
 		var remainder_for_remaining_height_per_page ;
 		var tb_page_break_before_yn = "" ;
 		
-		console.log("papersize_height : " + config.papersize_height);
-		height_per_page = config.papersize_height;
-		if(config.repeat_header){
+		console.log("papersize_height : " + papersize_height);
+		height_per_page = papersize_height;
+		if(repeat_header == "y"){
 			console.log("ph_height : " + ph_height);
 			height_per_page -= ph_height;
 		}
-		if(config.repeat_docinfo){
+		if(repeat_docinfo == "y"){
 			console.log("pdi_height : " + pdi_height);
 			height_per_page -= pdi_height;
 		}
-		if(config.repeat_rowheader){
+		if(repeat_rowheader == "y"){
 			console.log("prh_height : " + prh_height);
 			height_per_page -= prh_height;
 		}
-		if(config.repeat_footer){
+		if(repeat_footer == "y"){
 			console.log("pf_height : " + pf_height);
 			height_per_page -= pf_height;
 		}
-		if(config.repeat_footer_logo){
+		if(repeat_footer_logo == "y"){
 			console.log("pfl_height : " + pfl_height);
 			height_per_page -= pfl_height;
 		}
@@ -322,7 +306,7 @@ function printform_process(printform, config) {
 			
 			if(current_page_height == 0){
 				addHeader(pheader, pformat);
-				if(config.repeat_header){
+				if(repeat_header == "y"){
 					
 				}else{
 					current_page_height += ph_height;
@@ -330,14 +314,14 @@ function printform_process(printform, config) {
 				
 				addDocInfo(pdocinfo, pformat);
 				
-				if(config.repeat_docinfo){
+				if(repeat_docinfo == "y"){
 					
 				}else{
 					current_page_height += pdi_height;
 				}
 				
 				addRowHeader(prowheader, pformat);
-				if(config.repeat_rowheader){
+				if(repeat_rowheader == "y"){
 					
 				}else{
 					current_page_height += prh_height;
@@ -355,33 +339,33 @@ function printform_process(printform, config) {
 				
 				current_page_height -= temp;
 				
-				current_page_height = process_to_insert_dummy_row_item_while_format_table(config.insert_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item);
+				current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
 
-				current_page_height = process_to_insert_dummy_row_while_format_table(config.insert_dummy_row_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item, config.papersize_width);
+				current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
 				
-				current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(config.insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+				current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 				
-				process_to_insert_footer_spacer_while_format_table(config.insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+				process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 				
-				if(config.repeat_footer){
+				if(repeat_footer == "y"){
 					addFooter(pfooter, pformat);
 				}
 				
-				if(config.repeat_footer_logo){
+				if(repeat_footer_logo == "y"){
 					addFooterLogo(pfooter_logo, pformat);
 				}
 				
 				addDivPageBreakBefore(div_page_break_before, pformat);
 				
-				if(config.repeat_header){
+				if(repeat_header == "y"){
 					addHeader(pheader, pformat);
 				}
 				
-				if(config.repeat_docinfo){
+				if(repeat_docinfo == "y"){
 					addDocInfo(pdocinfo, pformat);
 				}
 				
-				if(config.repeat_rowheader){
+				if(repeat_rowheader == "y"){
 					addRowHeader(prowheader, pformat);
 				}
 				
@@ -395,33 +379,33 @@ function printform_process(printform, config) {
 				}else{
 					current_page_height -= temp;
 					
-					current_page_height = process_to_insert_dummy_row_item_while_format_table(config.insert_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item);
+					current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
 					
-					current_page_height = process_to_insert_dummy_row_while_format_table(config.insert_dummy_row_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item, config.papersize_width);
+					current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
 					
-					current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(config.insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+					current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 					
-					process_to_insert_footer_spacer_while_format_table(config.insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+					process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 					
-					if(config.repeat_footer){
+					if(repeat_footer == "y"){
 						addFooter(pfooter, pformat);
 					}
 					
-					if(config.repeat_footer_logo){
+					if(repeat_footer_logo == "y"){
 						addFooterLogo(pfooter_logo, pformat);
 					}
 					
 					addDivPageBreakBefore(div_page_break_before, pformat);
 					
-					if(config.repeat_header){
+					if(repeat_header == "y"){
 						addHeader(pheader, pformat);
 					}
 					
-					if(config.repeat_docinfo){
+					if(repeat_docinfo == "y"){
 						addDocInfo(pdocinfo, pformat);
 					}
 					
-					if(config.repeat_rowheader){
+					if(repeat_rowheader == "y"){
 						addRowHeader(prowheader, pformat);
 					}
 					
@@ -437,10 +421,10 @@ function printform_process(printform, config) {
 		// Last Footer [start]
 		current_page_height += pf_height;
 		current_page_height += pfl_height;
-		if(config.repeat_footer){
+		if(repeat_footer == "y"){
 			current_page_height -= pf_height;
 		}
-		if(config.repeat_footer_logo){
+		if(repeat_footer_logo == "y"){
 			current_page_height -= pfl_height;
 		}
 	
@@ -453,13 +437,13 @@ function printform_process(printform, config) {
 		
 		if(current_page_height <= height_per_page){
 			// Spacer [start] 
-			current_page_height = process_to_insert_dummy_row_item_while_format_table(config.insert_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item);
+			current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
 			
-			current_page_height = process_to_insert_dummy_row_while_format_table(config.insert_dummy_row_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item, config.papersize_width);
+			current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
 			
-			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(config.insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 			
-			process_to_insert_footer_spacer_while_format_table(config.insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+			process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 			// Spacer [end  ] 
 			
 			addFooter(pfooter, pformat);
@@ -469,25 +453,25 @@ function printform_process(printform, config) {
 			current_page_height -= pf_height;
 			current_page_height -= pfl_height;
 			
-			if(config.repeat_footer){
+			if(repeat_footer == "y"){
 				current_page_height += pf_height;
 			}
-			if(config.repeat_footer_logo){
+			if(repeat_footer_logo == "y"){
 				current_page_height += pfl_height;
 			}
 			
-			current_page_height = process_to_insert_dummy_row_item_while_format_table(config.insert_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item);
+			current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
 			
-			current_page_height = process_to_insert_dummy_row_while_format_table(config.insert_dummy_row_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item, config.papersize_width);
+			current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
 			
-			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(config.insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 			
-			process_to_insert_footer_spacer_while_format_table(config.insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+			process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 			
-			if(config.repeat_footer){
+			if(repeat_footer == "y"){
 				addFooterLogo(pfooter, pformat);
 			}
-			if(config.repeat_footer_logo){
+			if(repeat_footer_logo == "y"){
 				addFooterLogo(pfooter_logo, pformat);
 			}
 					
@@ -498,28 +482,28 @@ function printform_process(printform, config) {
 			current_page_height = 0;
 			
 			
-			if(config.repeat_header){
+			if(repeat_header == "y"){
 				addHeader(pheader, pformat);
 			}else{
 				
 			}
 			
-			if(config.repeat_docinfo){
+			if(repeat_docinfo == "y"){
 				addDocInfo(pdocinfo, pformat);
 			}else{
 				
 			}
 			
-			if(config.repeat_rowheader){
+			if(repeat_rowheader == "y"){
 				addRowHeader(prowheader, pformat);
 			}else{
 				
 			}
 			
-			if(config.repeat_footer){
+			if(repeat_footer == "y"){
 				current_page_height -= pf_height;
 			}
-			if(config.repeat_footer_logo){
+			if(repeat_footer_logo == "y"){
 				current_page_height -= pfl_height;
 			}
 			
@@ -527,13 +511,13 @@ function printform_process(printform, config) {
 			current_page_height += pfl_height;
 			
 			// Spacer [start] 
-			current_page_height = process_to_insert_dummy_row_item_while_format_table(config.insert_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item);
+			current_page_height = process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item);
 			
-			current_page_height = process_to_insert_dummy_row_while_format_table(config.insert_dummy_row_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat, config.height_of_dummy_row_item, config.papersize_width);
+			current_page_height = process_to_insert_dummy_row_while_format_table(insert_dummy_row_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat, height_of_dummy_row_item, papersize_width);
 			
-			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(config.insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+			current_page_height = process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(insert_footer_spacer_with_dummy_row_item_while_format_table, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 			
-			process_to_insert_footer_spacer_while_format_table(config.insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, config.repeat_footer_logo, pfl_height, pformat);
+			process_to_insert_footer_spacer_while_format_table(insert_footer_spacer_while_format_table, pfooter_spacer, height_per_page, current_page_height, repeat_footer_logo, pfl_height, pformat);
 			// Spacer [end  ] 
 			
 			addFooter(pfooter, pformat);
@@ -573,15 +557,15 @@ async function run_function_sequentially() {
 	console.log(prinbform_no);
 	for(var i = 0; i < prinbform_no; i ++){
 		try{await pause_in_milliseconds(1);}catch(error){console.error("pause_in_milliseconds error");}
-		try{await printform_process(printform[i], getConfigFromElement(printform[i]));}     catch(error){console.error("printform_process error");}
+		try{await printform_process();}     catch(error){console.error("printform_process error");}
 	}
 }
 
 if(!run_function_sequentially_processed){ var run_function_sequentially_processed = false; }
 
-window.addEventListener('DOMContentLoaded', function() {
-	if(run_function_sequentially_processed == false){
+window.onload = function() {
+    if(run_function_sequentially_processed == false){
 		run_function_sequentially();
 		run_function_sequentially_processed = true;
 	}
-});
+};
