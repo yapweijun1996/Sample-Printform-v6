@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrintForm 优化版本测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .printform {
+            border: 2px solid #ddd;
+            margin: 20px 0;
+            background: white;
+        }
+        
+        .pheader {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .pdocinfo {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .prowheader {
+            background: #e9ecef;
+            padding: 12px 15px;
+            font-weight: bold;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .prowitem {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .prowitem:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .prowitem:nth-child(even) {
+            background-color: #fafafa;
+        }
+        
+        .tb_page_break_before {
+            border-left: 4px solid #dc3545;
+            background-color: #fff5f5 !important;
+        }
+        
+        .tb_page_break_before::before {
+            content: "🔄 强制分页";
+            color: #dc3545;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .pfooter {
+            background: #343a40;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .pfooter_logo {
+            background: #6c757d;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 5px;
+        }
+        
+        .controls button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .controls button:hover {
+            background: #1976d2;
+        }
+        
+        .controls button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .config-panel {
+            background: #f1f8e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .config-panel label {
+            display: inline-block;
+            margin: 5px 15px 5px 0;
+            font-size: 14px;
+        }
+        
+        .config-panel input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        
+        .config-panel input[type="number"] {
+            width: 80px;
+            padding: 2px 5px;
+            margin-left: 5px;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+        
+        @media print {
+            body { margin: 0; background: white; }
+            .container { box-shadow: none; }
+            .controls, .config-panel { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PrintForm 优化版本测试</h1>
+        
+        <div class="controls">
+            <h3>控制面板</h3>
+            <button onclick="processWithOriginal()">使用原版本处理</button>
+            <button onclick="processWithOptimized()">使用优化版本处理</button>
+            <button onclick="resetForms()">重置表单</button>
+            <button onclick="window.print()">打印预览</button>
+        </div>
+        
+        <div class="config-panel">
+            <h4>配置选项</h4>
+            <label><input type="checkbox" id="repeatHeader" checked> 重复页眉</label>
+            <label><input type="checkbox" id="repeatDocInfo" checked> 重复文档信息</label>
+            <label><input type="checkbox" id="repeatRowHeader" checked> 重复行标题</label>
+            <label><input type="checkbox" id="repeatFooter"> 重复页脚</label>
+            <label><input type="checkbox" id="repeatFooterLogo"> 重复页脚Logo</label>
+            <br>
+            <label>纸张高度: <input type="number" id="paperHeight" value="600" min="400" max="2000"></label>
+            <label>纸张宽度: <input type="number" id="paperWidth" value="750" min="400" max="1200"></label>
+            <label>虚拟行高度: <input type="number" id="dummyRowHeight" value="18" min="10" max="50"></label>
+        </div>
+        
+        <div id="status" class="status info">
+            准备就绪 - 选择处理方式来测试PrintForm库
+        </div>
+        
+        <!-- 测试表单 1 -->
+        <div class="printform" id="form1">
+            <div class="pheader">测试表单 #1 - 页眉</div>
+            <div class="pdocinfo">文档信息：创建日期 2024-01-01 | 版本 v2.0 | 作者：测试用户</div>
+            <div class="prowheader">数据行列表</div>
+            
+            <div class="prowitem">第1行：这是一个普通的数据行项目</div>
+            <div class="prowitem">第2行：包含更多内容的数据行，用于测试不同高度的行项目处理</div>
+            <div class="prowitem">第3行：短内容</div>
+            <div class="prowitem">第4行：中等长度的内容，用于测试分页算法</div>
+            <div class="prowitem tb_page_break_before">第5行：强制分页行 - 这一行会强制开始新页面</div>
+            <div class="prowitem">第6行：分页后的第一行</div>
+            <div class="prowitem">第7行：继续在新页面上的内容</div>
+            <div class="prowitem">第8行：更多测试数据</div>
+            <div class="prowitem">第9行：接近页面底部的内容</div>
+            <div class="prowitem">第10行：最后一行数据</div>
+            
+            <div class="pfooter">页脚信息 - 版权所有 © 2024</div>
+            <div class="pfooter_logo">公司Logo区域</div>
+        </div>
+        
+        <!-- 测试表单 2 -->
+        <div class="printform" id="form2">
+            <div class="pheader">测试表单 #2 - 简短表单</div>
+            <div class="pdocinfo">简短文档信息</div>
+            <div class="prowheader">简短列表</div>
+            
+            <div class="prowitem">简短行1</div>
+            <div class="prowitem">简短行2</div>
+            <div class="prowitem">简短行3</div>
+            
+            <div class="pfooter">简短页脚</div>
+            <div class="pfooter_logo">Logo</div>
+        </div>
+        
+        <div class="status info">
+            <strong>使用说明：</strong>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+                <li>点击"使用优化版本处理"来测试新的PrintForm库</li>
+                <li>调整配置选项来测试不同的设置</li>
+                <li>使用"打印预览"查看分页效果</li>
+                <li>红色边框的行会强制分页</li>
+                <li>处理后原始表单会被替换为格式化版本</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 引入优化后的PrintForm库 -->
+    <script src="js/printform-optimized.js"></script>
+    
+    <script>
+        let isProcessed = false;
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        function getConfig() {
+            return {
+                repeatHeader: document.getElementById('repeatHeader').checked,
+                repeatDocInfo: document.getElementById('repeatDocInfo').checked,
+                repeatRowHeader: document.getElementById('repeatRowHeader').checked,
+                repeatFooter: document.getElementById('repeatFooter').checked,
+                repeatFooterLogo: document.getElementById('repeatFooterLogo').checked,
+                paperHeight: parseInt(document.getElementById('paperHeight').value),
+                paperWidth: parseInt(document.getElementById('paperWidth').value),
+                dummyRowHeight: parseInt(document.getElementById('dummyRowHeight').value),
+                insertDummyRowItem: true,
+                insertFooterSpacerWithDummyRow: true
+            };
+        }
+        
+        async function processWithOptimized() {
+            if (isProcessed) {
+                updateStatus('表单已经处理过，请先重置', 'error');
+                return;
+            }
+            
+            try {
+                updateStatus('正在使用优化版本处理...', 'info');
+                
+                const config = getConfig();
+                const printForm = new PrintForm(config);
+                
+                const startTime = performance.now();
+                await printForm.processAll();
+                const endTime = performance.now();
+                
+                isProcessed = true;
+                updateStatus(`优化版本处理完成！耗时: ${(endTime - startTime).toFixed(2)}ms`, 'success');
+                
+            } catch (error) {
+                updateStatus(`处理失败: ${error.message}`, 'error');
+                console.error('Processing error:', error);
+            }
+        }
+        
+        function processWithOriginal() {
+            updateStatus('原版本功能需要引入原始printform.js文件', 'error');
+        }
+        
+        function resetForms() {
+            location.reload();
+        }
+        
+        // 配置变化时的提示
+        document.querySelectorAll('.config-panel input').forEach(input => {
+            input.addEventListener('change', () => {
+                if (isProcessed) {
+                    updateStatus('配置已更改，请重置表单后重新处理', 'info');
+                }
+            });
+        });
+        
+        // 页面加载完成提示
+        window.addEventListener('load', () => {
+            updateStatus('页面加载完成，可以开始测试', 'success');
+        });
+    </script>
+</body>
+</html> 
