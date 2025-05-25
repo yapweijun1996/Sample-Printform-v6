@@ -48,7 +48,27 @@
 			 data-insert-footer-spacer-while-format-table="n"
 			 data-insert-footer-spacer-with-dummy-row-item-while-format-table="n"
 			 >
-			 
+			 <template class="custom-dummy-row-item-content">
+				
+			</template>
+			<template class="custom-footer-page-content">
+				<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pheader">
+					<tr>
+						<td style="box-sizing:border-box;width:15px;"></td>
+						<td style="box-sizing:border-box;width:inherit;"></td>
+						<td style="box-sizing:border-box;width:15px;"></td>
+					</tr>
+					<tr style="height:10px;"></tr>
+					<tr>
+						<td style="box-sizing:border-box;"></td>
+						<td style="box-sizing:border-box;">
+							Page <span class="page-number"></span> of <span class="total-pages"></span>
+						</td>
+						<td style="box-sizing:border-box;"></td>
+					</tr>
+					<tr style="height:10px;"></tr>
+				</table>
+			</template>
 			<table cellpadding="0" cellspacing="0" style="table-layout:fixed;" border="0" class="paper_width pheader">
 				<tr>
 					<td style="box-sizing:border-box;width:15px;"></td>
