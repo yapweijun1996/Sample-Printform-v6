@@ -521,9 +521,7 @@ async function processAllPrintforms() {
 
 let hasProcessedOnLoad = false; 
 
-window.onload = function() {
-    if(hasProcessedOnLoad === false){ 
-		processAllPrintforms(); 
-		hasProcessedOnLoad = true;
-	}
-};
+if(hasProcessedOnLoad === false){ 
+	processAllPrintforms(); 
+	hasProcessedOnLoad = true;
+}
