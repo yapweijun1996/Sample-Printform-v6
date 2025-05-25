@@ -17,7 +17,7 @@ var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
 /****** Setting [end  ] ******/
 
 function formatIntl(num) {
-	return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }).format(num);
+	return parseFloat(Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }).format(num));
 }
 
 // [INJECT] Read per-form config from data-* attributes
@@ -365,7 +365,7 @@ async function printform_process(formEl, config){
 	
 	// Loop all row item [start]
 	for( var i = 0; i < prowitem.length ; i ++){
-		temp = formatIntl(parseFloat(prowitem[i].getBoundingClientRect().height));
+		temp = parseFloat(formatIntl(prowitem[i].getBoundingClientRect().height));
 		
 		if(current_page_height == 0){
 			addHeader(pheader, pformat);
