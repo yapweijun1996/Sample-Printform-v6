@@ -3,21 +3,103 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Printform Demo - Multiple Configurations</title>
+		<title>Printform Demo - Professional Look</title>
 		<style>
-			body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-			.printform { margin: 24px auto; border: 1px solid #ccc; background: #fff; }
-			.printform .pheader, .printform .pfooter { background: #f0f0f0; }
-			.printform .prowitem { background: #fafafa; }
-			.printform .pfooter { font-size: 13px; }
-			.section-title { font-weight: bold; font-size: 1.2em; margin: 32px 0 8px 0; }
+			body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f8f9fa; }
+			.printform {
+				margin: 32px auto 48px auto;
+				border: 1.5px solid #bbb;
+				background: #fff;
+				box-shadow: 0 2px 8px #0001;
+				max-width: 600px;
+				padding: 32px 32px 24px 32px;
+				border-radius: 8px;
+				position: relative;
+			}
+			.printform .logo {
+				width: 120px;
+				margin-bottom: 12px;
+			}
+			.printform .company-info {
+				font-size: 15px;
+				color: #444;
+				margin-bottom: 16px;
+			}
+			.printform .pheader {
+				font-size: 22px;
+				font-weight: bold;
+				color: #2a2a2a;
+				margin-bottom: 8px;
+				border-bottom: 2px solid #eee;
+				padding-bottom: 6px;
+			}
+			.printform .pdocinfo {
+				font-size: 15px;
+				color: #555;
+				margin-bottom: 12px;
+			}
+			.printform .prowheader {
+				background: #e9ecef;
+				font-weight: bold;
+				font-size: 15px;
+				border-radius: 4px 4px 0 0;
+			}
+			.printform table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 0;
+			}
+			.printform .prowitem td {
+				background: #fcfcfc;
+				border-bottom: 1px solid #eee;
+				padding: 7px 6px;
+				font-size: 15px;
+			}
+			.printform .prowheader td {
+				padding: 8px 6px;
+				border-bottom: 2px solid #ddd;
+			}
+			.printform .pfooter {
+				background: #f8f9fa;
+				font-size: 16px;
+				font-weight: bold;
+				color: #2a2a2a;
+				border-top: 2px solid #eee;
+				margin-top: 12px;
+				padding: 8px 0 0 0;
+			}
+			.printform .footer-note {
+				font-size: 13px;
+				color: #888;
+				margin-top: 8px;
+			}
+			.print-btn {
+				position: absolute;
+				top: 16px;
+				right: 24px;
+				background: #007bff;
+				color: #fff;
+				border: none;
+				border-radius: 4px;
+				padding: 6px 16px;
+				font-size: 15px;
+				cursor: pointer;
+				transition: background 0.2s;
+			}
+			.print-btn:hover { background: #0056b3; }
+			@media print {
+				.print-btn, .section-title, h1, p { display: none !important; }
+				body { background: #fff; }
+				.printform { box-shadow: none; border: none; margin: 0; }
+			}
+			.section-title { font-weight: bold; font-size: 1.2em; margin: 40px 0 12px 0; color: #007bff; }
 		</style>
 	</head>
 	<body>
-		<h1>Printform Demo: Multiple Configurations</h1>
-		<p>This demo shows two printforms on the same page, each with its own configuration using <code>data-</code> attributes.</p>
+		<h1>Printform Demo: Professional Invoice & Receipt</h1>
+		<p>This demo shows two printforms on the same page, each with its own configuration and a more realistic, professional look. Click the print button on each form to print just that form.</p>
 
-		<!-- Printform 1: Invoice, A5 size, header/footer, row height 27 -->
+		<!-- Printform 1: Invoice -->
 		<div class="section-title">Printform 1: Invoice (A5, header+footer, row height 27)</div>
 		<div class="printform"
 			 data-repeat-header="y"
@@ -32,16 +114,29 @@
 			 data-papersize-width="396"
 			 data-papersize-height="550"
 			 data-height-of-dummy-row-item="27">
-			<table class="pheader" width="100%"><tr><td><b>Invoice Header</b></td></tr></table>
-			<table class="pdocinfo" width="100%"><tr><td>Doc Info: Invoice #001</td></tr></table>
-			<table class="prowheader" width="100%"><tr><td><b>Description</b></td><td><b>Qty</b></td><td><b>Price</b></td></tr></table>
-			<table class="prowitem" width="100%"><tr><td>Item A</td><td>2</td><td>10.00</td></tr></table>
-			<table class="prowitem" width="100%"><tr><td>Item B</td><td>1</td><td>20.00</td></tr></table>
-			<table class="prowitem" width="100%"><tr><td>Item C</td><td>5</td><td>5.00</td></tr></table>
-			<table class="pfooter" width="100%"><tr><td>Total: 55.00</td></tr></table>
+			<!-- Print button for this form only -->
+			<button class="print-btn" onclick="printThisForm(this)">Print</button>
+			<!-- Company logo and info -->
+			<img src="img/letterhead_logo.jpg" alt="Company Logo" class="logo">
+			<div class="company-info">
+				<div>Sample Company Pte Ltd</div>
+				<div>123 Main Street, Singapore 123456</div>
+				<div>Tel: +65 1234 5678 | Email: info@sample.com</div>
+			</div>
+			<div class="pheader">INVOICE</div>
+			<div class="pdocinfo">Invoice #: INV-2024-001 &nbsp; | &nbsp; Date: 2024-06-01 &nbsp; | &nbsp; Due: 2024-06-15</div>
+			<table class="prowheader"><tr><td>Description</td><td>Qty</td><td>Unit Price</td><td>Amount</td></tr></table>
+			<table class="prowitem"><tr><td>Consulting Services</td><td>10</td><td>100.00</td><td>1,000.00</td></tr></table>
+			<table class="prowitem"><tr><td>Software License</td><td>1</td><td>500.00</td><td>500.00</td></tr></table>
+			<table class="prowitem"><tr><td>Support Fee</td><td>1</td><td>200.00</td><td>200.00</td></tr></table>
+			<table class="pfooter"><tr><td colspan="3" style="text-align:right;">Subtotal:</td><td>1,700.00</td></tr>
+				<tr><td colspan="3" style="text-align:right;">GST (8%):</td><td>136.00</td></tr>
+				<tr><td colspan="3" style="text-align:right;">Total:</td><td>1,836.00</td></tr>
+			</table>
+			<div class="footer-note">Thank you for your business!</div>
 		</div>
 
-		<!-- Printform 2: Receipt, custom size, no header/footer, row height 20 -->
+		<!-- Printform 2: Receipt -->
 		<div class="section-title">Printform 2: Receipt (Custom size, no header/footer, row height 20)</div>
 		<div class="printform"
 			 data-repeat-header="n"
@@ -56,13 +151,34 @@
 			 data-papersize-width="300"
 			 data-papersize-height="400"
 			 data-height-of-dummy-row-item="20">
-			<table class="prowheader" width="100%"><tr><td><b>Item</b></td><td><b>Qty</b></td><td><b>Amount</b></td></tr></table>
-			<table class="prowitem" width="100%"><tr><td>Apple</td><td>3</td><td>3.00</td></tr></table>
-			<table class="prowitem" width="100%"><tr><td>Banana</td><td>2</td><td>2.00</td></tr></table>
-			<table class="prowitem" width="100%"><tr><td>Orange</td><td>1</td><td>1.50</td></tr></table>
+			<button class="print-btn" onclick="printThisForm(this)">Print</button>
+			<img src="img/footer_logo.jpg" alt="Shop Logo" class="logo">
+			<div class="company-info">
+				<div>Sample Mini Mart</div>
+				<div>456 Orchard Road, Singapore 654321</div>
+				<div>Tel: +65 8765 4321</div>
+			</div>
+			<div class="prowheader">
+				<table><tr><td>Item</td><td>Qty</td><td>Amount</td></tr></table>
+			</div>
+			<table class="prowitem"><tr><td>Apple</td><td>3</td><td>3.00</td></tr></table>
+			<table class="prowitem"><tr><td>Banana</td><td>2</td><td>2.00</td></tr></table>
+			<table class="prowitem"><tr><td>Orange</td><td>1</td><td>1.50</td></tr></table>
+			<div class="footer-note">No returns or exchanges after 7 days.</div>
 		</div>
 
 		<!-- JS: Printform logic -->
 		<script src="js/printform.js"></script>
+		<script>
+			// Print only the selected printform
+			function printThisForm(btn) {
+				var form = btn.closest('.printform');
+				var orig = document.body.innerHTML;
+				document.body.innerHTML = '';
+				document.body.appendChild(form.cloneNode(true));
+				window.print();
+				location.reload(); // reload to restore page
+			}
+		</script>
 	</body>
 </html>
