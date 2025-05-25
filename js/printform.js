@@ -16,47 +16,32 @@ var papersize_height = papersize_height || 1050; // Default to a standard A4 hei
 var height_of_dummy_row_item = height_of_dummy_row_item || 18; // Default height
 /****** Setting [end  ] ******/
 
-
-function add_dummy_row(target_element, papersize_width, height_of_dummy_row){
-	
-	var dummy_row_item_table = document.createElement('table');
-	dummy_row_item_table.className = 'dummy_row';
-	dummy_row_item_table.setAttribute('width', papersize_width + 'px');
-	dummy_row_item_table.setAttribute('cellspacing', '0');
-	dummy_row_item_table.setAttribute('cellpadding', '0');
-	
-	var dummy_row_item_inner_html = `
-	<tr style='height:`+height_of_dummy_row+`px;'>
-		<td style="border:0px solid black;"></td>
-	</tr>
-	`;
-	dummy_row_item_table.innerHTML = dummy_row_item_inner_html;
-	//target_element.insertAdjacentElement('beforebegin', dummy_row_item_table)
-	target_element.appendChild(dummy_row_item_table);
-}
-function add_dummy_row_item(target_element, height_of_dummy_row_item){
-	
-	var dummy_row_item_table = document.createElement('table');
-	dummy_row_item_table.className = 'dummy_row_item';
-	dummy_row_item_table.setAttribute('width', papersize_width + 'px');
-	dummy_row_item_table.setAttribute('cellspacing', '0');
-	dummy_row_item_table.setAttribute('cellpadding', '0');
-	
-	var dummy_row_item_inner_html = `
-	<tr style='height:`+height_of_dummy_row_item+`px;'>
-		<td style="border:0px solid black;"></td>
-	</tr>
-	`;
-	
-	if(typeof custom_dummy_row_item_content !== "undefined"){
-		if(custom_dummy_row_item_content != ""){
-			dummy_row_item_inner_html = custom_dummy_row_item_content;
-		}
+// Insert createSpacer helper to DRY dummy-row logic
+function createSpacer({ targetElement, height, className, width, content }) {
+	var spacer = document.createElement('table');
+	spacer.className = className;
+	spacer.setAttribute('width', width + 'px');
+	spacer.setAttribute('cellspacing', '0');
+	spacer.setAttribute('cellpadding', '0');
+	if (content) {
+		spacer.innerHTML = content;
+	} else {
+		spacer.innerHTML = `<tr style='height:${height}px;'><td style="border:0px solid black;"></td></tr>`;
 	}
-	dummy_row_item_table.innerHTML = dummy_row_item_inner_html;
-	//target_element.insertAdjacentElement('beforebegin', dummy_row_item_table)
-	target_element.appendChild(dummy_row_item_table);
+	targetElement.appendChild(spacer);
 }
+
+// Refactor add_dummy_row to use createSpacer
+function add_dummy_row(target_element, papersize_width, height_of_dummy_row){
+	createSpacer({ targetElement: target_element, height: height_of_dummy_row, className: 'dummy_row', width: papersize_width });
+}
+
+// Refactor add_dummy_row_item to use createSpacer
+function add_dummy_row_item(target_element, height_of_dummy_row_item){
+	var content = (typeof custom_dummy_row_item_content !== "undefined" && custom_dummy_row_item_content !== "") ? custom_dummy_row_item_content : null;
+	createSpacer({ targetElement: target_element, height: height_of_dummy_row_item, className: 'dummy_row_item', width: papersize_width, content: content });
+}
+
 function insert_dummy_row_item(target_element, diff_height_from_papersize, height_of_dummy_row){
 	// Add spacer [start] insert dummy row item
 	if(diff_height_from_papersize > 0){
