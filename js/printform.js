@@ -101,6 +101,7 @@ function insert_dummy_row_item(target_element, diff_height_from_papersize, heigh
 	if(diff_height_from_papersize > 0){
 		var number_of_dummy_row_item_will_be_insert = 0;
 		number_of_dummy_row_item_will_be_insert = Math.floor(diff_height_from_papersize / height_of_dummy_row);
+		cl("pformat : insert_dummy_row_item number_of_dummy_row_item_will_be_insert: "+ number_of_dummy_row_item_will_be_insert);
 		for( var i = 0 ; i < number_of_dummy_row_item_will_be_insert ; i++){
 			add_dummy_row_item(target_element, height_of_dummy_row);
 		}
