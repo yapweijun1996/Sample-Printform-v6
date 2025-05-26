@@ -96,7 +96,7 @@ function add_dummy_row_item(target_element, height_of_dummy_row_item){
 function insert_dummy_row_item(target_element, diff_height_from_papersize, height_of_dummy_row){
 	
 	cl("pformat : insert_dummy_row_item diff_height_from_papersize: "+ diff_height_from_papersize);
-	cl.log("pformat : insert_dummy_row_item height_of_dummy_row: "+ height_of_dummy_row);
+	cl("pformat : insert_dummy_row_item height_of_dummy_row: "+ height_of_dummy_row);
 	// Add spacer [start] insert dummy row item
 	if(diff_height_from_papersize > 0){
 		var number_of_dummy_row_item_will_be_insert = 0;
