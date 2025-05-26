@@ -366,6 +366,8 @@ async function printform_process(formEl, config){
 	// Loop all row item [start]
 	for( var i = 0; i < prowitem.length ; i ++){
 		temp = prowitem[i].offsetHeight;
+		cl("temp prowitem " + i);
+		cl(temp);
 		
 		if(current_page_height == 0){
 			addHeader(pheader, pformat);
