@@ -94,6 +94,9 @@ function add_dummy_row_item(target_element, height_of_dummy_row_item){
 	target_element.appendChild(dummy_row_item_table);
 }
 function insert_dummy_row_item(target_element, diff_height_from_papersize, height_of_dummy_row){
+	
+	cl("pformat : insert_dummy_row_item diff_height_from_papersize: "+ diff_height_from_papersize);
+	cl.log("pformat : insert_dummy_row_item height_of_dummy_row: "+ height_of_dummy_row);
 	// Add spacer [start] insert dummy row item
 	if(diff_height_from_papersize > 0){
 		var number_of_dummy_row_item_will_be_insert = 0;
@@ -140,7 +143,6 @@ function process_to_insert_footer_spacer_with_dummy_row_item_while_format_table(
 		console.log("pformat : remaining_height_per_page : "+ remaining_height_per_page);
 		if(remaining_height_per_page > 0){
 			insert_dummy_row_item(pformat, remaining_height_per_page, height_of_dummy_row_item);
-			console.log("pformat : insert_dummy_row_item : "+ remaining_height_per_page);
 			remainder_for_remaining_height_per_page = (formatIntl((remaining_height_per_page % height_of_dummy_row_item)));
 			current_page_height = height_per_page - remainder_for_remaining_height_per_page;
 		}
@@ -159,7 +161,6 @@ function process_to_insert_dummy_row_item_while_format_table(insert_dummy_row_it
 		remaining_height_per_page = height_per_page - current_page_height;
 		if(remaining_height_per_page > 0){
 			insert_dummy_row_item(pformat, remaining_height_per_page, height_of_dummy_row_item);
-			console.log("pformat : insert_dummy_row_item : "+ remaining_height_per_page);
 			remainder_for_remaining_height_per_page = (formatIntl((remaining_height_per_page % height_of_dummy_row_item)));
 			current_page_height = height_per_page - remainder_for_remaining_height_per_page;
 			cl("current_page_height");
